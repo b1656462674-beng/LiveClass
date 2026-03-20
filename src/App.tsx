@@ -25,7 +25,19 @@ import { motion, AnimatePresence } from 'motion/react';
 
 // --- Types ---
 
-type Page = 'home' | 'ielts' | 'japan' | 'ht-teachers';
+type Page = 'home' | 'ielts' | 'japan' | 'ht-teachers' | 'course-detail';
+
+interface Course {
+  id: string;
+  title: string;
+  subtitle?: string;
+  price?: string;
+  lessons?: string;
+  seed?: string;
+  tags?: string[];
+  icon?: string;
+  type?: 'ielts' | 'japan' | 'korea';
+}
 
 interface KingKongItem {
   id: string;
@@ -39,8 +51,8 @@ interface KingKongItem {
 const KING_KONG_ITEMS: KingKongItem[] = [
   { id: 'ielts', label: '雅思备考', icon: <BookOpen className="w-6 h-6 text-white" />, color: 'bg-purple-500' },
   { id: 'japan', label: '日韩留学', icon: <Globe className="w-6 h-6 text-white" />, color: 'bg-yellow-500' },
-  { id: 'kids', label: '少儿英语', icon: <Baby className="w-6 h-6 text-white" />, color: 'bg-pink-500' },
-  { id: 'oral', label: '日常口语', icon: <MessageCircle className="w-6 h-6 text-white" />, color: 'bg-blue-400' },
+  { id: 'kids', label: '运营配置3', icon: <Baby className="w-6 h-6 text-white" />, color: 'bg-pink-500' },
+  { id: 'oral', label: '运营配置4', icon: <MessageCircle className="w-6 h-6 text-white" />, color: 'bg-blue-400' },
   { id: 'op5', label: '运营配置5', icon: <Settings className="w-6 h-6 text-white" />, color: 'bg-emerald-500' },
   { id: 'ht-teachers', label: 'HT-外教课程', icon: <Star className="w-6 h-6 text-white" />, color: 'bg-orange-400' },
   { id: 'op7', label: '运营配置7', icon: <Heart className="w-6 h-6 text-white" />, color: 'bg-rose-400' },
@@ -49,16 +61,21 @@ const KING_KONG_ITEMS: KingKongItem[] = [
 
 // --- Components ---
 
-const Header = ({ title, onBack }: { title: string; onBack?: () => void }) => (
+const Header = ({ title, onBack, rightElement }: { title: string; onBack?: () => void; rightElement?: React.ReactNode }) => (
   <div className="sticky top-0 z-50 bg-white px-4 py-3 flex items-center border-b border-gray-100">
-    {onBack && (
-      <button onClick={onBack} className="p-1 -ml-1">
-        <ChevronLeft className="w-6 h-6 text-gray-800" />
-      </button>
-    )}
-    <h1 className="flex-1 text-center text-lg font-medium text-gray-900 mr-6">
+    <div className="w-10 flex justify-start">
+      {onBack && (
+        <button onClick={onBack} className="p-1 -ml-1">
+          <ChevronLeft className="w-6 h-6 text-gray-800" />
+        </button>
+      )}
+    </div>
+    <h1 className="flex-1 text-center text-lg font-medium text-gray-900 truncate px-2">
       {title}
     </h1>
+    <div className="w-10 flex justify-end">
+      {rightElement}
+    </div>
   </div>
 );
 
@@ -159,17 +176,19 @@ const HomePage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
                 if (item.id === 'japan') onNavigate('japan');
                 if (item.id === 'ht-teachers') onNavigate('ht-teachers');
               }}
-              className="flex flex-col items-center gap-2 active:scale-95 transition-transform relative"
+              className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
             >
-              <div className={`${item.color} w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm`}>
+              <div className={`${item.color} w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm relative`}>
                 {item.icon}
               </div>
-              {item.id === 'ielts' && (
-                <div className="absolute -top-1 -left-1 bg-orange-500 text-[8px] text-white font-bold px-1 rounded-full border border-white">
-                  HOT
-                </div>
-              )}
-              <span className="text-xs text-gray-700 font-medium text-center px-1">{item.label}</span>
+              <div className="flex items-center gap-0.5">
+                <span className="text-xs text-gray-700 font-medium text-center px-1">{item.label}</span>
+                {item.id === 'ielts' && (
+                  <div className="bg-orange-500 text-[8px] text-white font-bold px-1 rounded-full border border-white scale-90">
+                    HOT
+                  </div>
+                )}
+              </div>
             </button>
           ))}
         </div>
@@ -236,17 +255,164 @@ const HomePage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
 
 // --- Page: IELTS Prep ---
 
-const IELTSPrepPage = ({ onBack }: { onBack: () => void }) => {
+// --- Page: IELTS Prep ---
+
+const IELTSPrepPage = ({ onBack, onSelectCourse }: { onBack: () => void; onSelectCourse: (course: Course) => void }) => {
+  const courses: Course[] = [
+    { id: 'ielts-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['直播课', '欧美1v1'], icon: '欧', seed: 'ielts-eu', type: 'ielts' },
+    { id: 'ielts-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['直播课', '菲教1v1'], icon: '菲', seed: 'ielts-ph', type: 'ielts' },
+    { id: 'ielts-kids', title: 'kids外教1v1（所有课时包集合页）', tags: ['直播课', '少儿1v1'], icon: 'K', seed: 'ielts-kids', type: 'ielts' },
+    { id: 'ielts-biz', title: '流利商务口语', tags: ['录播课', '商务实战'], icon: '商', seed: 'ielts-biz', type: 'ielts' },
+    { id: 'ielts-life', title: '生活口语达人训练营', tags: ['录播课', '口语提升'], icon: '生', seed: 'ielts-life', type: 'ielts' },
+    { id: 'ielts-hitalk', title: 'Hitalk雅思外教1v1口语陪练', tags: ['直播课', '口语陪练'], icon: 'H', seed: 'ielts-hitalk', type: 'ielts' },
+    { id: 'ielts-premium', title: '雅思1v1精品班（所有课时包集合页）', tags: ['直播课', '精品1v1'], icon: '精', seed: 'ielts-premium', type: 'ielts' },
+    { id: 'ielts-vip', title: '雅思7分VIP班（定制班）', tags: ['混播课', '方案定制'], icon: 'V', seed: 'ielts-vip', type: 'ielts' },
+    { id: 'ielts-65', title: '初级水平直达雅思6.5分', tags: ['录播课', '零基础'], icon: '6.5', seed: 'ielts-65', type: 'ielts' },
+  ];
+
   return (
     <div className="bg-gray-50 min-h-screen pb-10">
       <Header title="雅思备考" onBack={onBack} />
+      
+      {/* Banner */}
+      <div className="px-4 py-4">
+        <div className="w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-md">
+          <img 
+            src="https://picsum.photos/seed/ielts-banner/800/400" 
+            alt="IELTS Banner" 
+            className="w-full h-full object-cover"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+      </div>
 
-      {/* Course Card Horizontal (Fig 2) */}
+      {/* Recorded Courses Grid */}
+      <SectionTitle title="热门录播课" extra="更多" />
+      <div className="px-4 mb-6">
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { id: 'ielts-rec-1', title: '雅思听力高分突破：场景词汇全掌握', lessons: '24课时', views: '85.6万', tag: '听力特训', seed: 'ielts-listening', type: 'ielts' as const },
+            { id: 'ielts-rec-2', title: '雅思阅读真题精讲：长难句破解', lessons: '32课时', views: '92.1万', tag: '阅读提分', seed: 'ielts-reading', type: 'ielts' as const },
+            { id: 'ielts-rec-3', title: '雅思写作高分范文：逻辑与表达', lessons: '28课时', views: '78.4万', tag: '写作精讲', seed: 'ielts-writing', type: 'ielts' as const },
+            { id: 'ielts-rec-4', title: '雅思口语预测：当季热点话题', lessons: '15课时', views: '112.3万', tag: '口语预测', seed: 'ielts-speaking', type: 'ielts' as const },
+          ].map((item, idx) => (
+            <div 
+              key={idx} 
+              onClick={() => onSelectCourse({ 
+                id: item.id, 
+                title: item.title, 
+                lessons: item.lessons, 
+                seed: item.seed, 
+                type: item.type,
+                tags: [item.tag, '录播课']
+              })}
+              className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col active:scale-95 transition-transform cursor-pointer"
+            >
+              <div className="relative aspect-video bg-gray-100">
+                <img src={`https://picsum.photos/seed/${item.seed}/400/225`} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <div className="absolute top-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm flex items-center gap-1">
+                  <Users className="w-2.5 h-2.5" /> {item.views}
+                </div>
+                <div className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                  {item.lessons}
+                </div>
+              </div>
+              <div className="p-3 flex-1 flex flex-col justify-between">
+                <h4 className="text-xs font-bold text-gray-800 line-clamp-2 leading-tight">{item.title}</h4>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-[10px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">{item.tag}</span>
+                  <span className="text-[10px] text-rose-500 font-medium">高分必看</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <SectionTitle title="直播课&混播课" />
+      <div className="px-4 mb-6">
+        <div className="grid grid-cols-2 gap-4">
+          {courses.map((item, idx) => (
+            <div 
+              key={idx} 
+              onClick={() => onSelectCourse(item)}
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex flex-col justify-between min-h-[160px] relative overflow-hidden active:scale-95 transition-transform cursor-pointer"
+            >
+               <div className="absolute -right-2 -top-2 opacity-5 text-6xl font-black select-none">
+                 {item.icon}
+               </div>
+               <div>
+                <h4 className="text-sm font-bold text-gray-800 leading-snug">{item.title}</h4>
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {item.tags?.map(tag => (
+                    <span key={tag} className="px-1.5 py-0.5 border border-orange-200 text-[10px] text-orange-400 rounded">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+               </div>
+               <div className="mt-4">
+                 <button className="w-full py-1.5 border border-orange-300 text-orange-400 text-xs rounded-full font-medium">
+                   查看详情
+                 </button>
+                 <div className="mt-2 pt-2 border-t border-gray-50 flex justify-between items-center text-[10px] text-gray-400">
+                   <span>好评率: 99%</span>
+                   <div className="flex items-center gap-0.5">
+                     <MessageSquare className="w-3 h-3" />
+                     <span>免费咨询</span>
+                   </div>
+                 </div>
+               </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Page: Course Detail ---
+
+const CourseDetailPage = ({ course, onBack }: { course: Course; onBack: () => void }) => {
+  const [showPayment, setShowPayment] = useState(false);
+  const isIELTS = course.type === 'ielts';
+  const isJapan = course.type === 'japan';
+  const isKorea = course.type === 'korea';
+
+  const painPoints = isIELTS ? [
+    "每次考试口语总是5.5分，流利度、词汇、语法、发音总有一项拖后腿？",
+    "回答生硬，逻辑跳跃，无法让考官理解你的真实水平？",
+    "自学或大班课无法获得针对个人问题的精准指导，进步缓慢？"
+  ] : isJapan ? [
+    "单词背了忘，语法理不清，N1/N2/N3考试总是差那么几分？",
+    "想去日本留学，却不知道如何规划，对申请流程一头雾水？",
+    "哑巴日语，只会写不会说，无法与日本人进行顺畅交流？"
+  ] : [
+    "韩语发音不准，基础不牢，看韩剧还要盯着字幕？",
+    "想考TOPIK，却不知道从何下手，缺乏系统的备考指导？",
+    "生活口语匮乏，想去韩国旅游或留学，却不敢开口说话？"
+  ];
+
+  const solutionTitle = isIELTS ? "雅思口语考前直击" : isJapan ? "日语能力考冲刺" : "韩语全能提升";
+
+  return (
+    <div className="bg-gray-50 min-h-screen pb-10 relative">
+      <Header 
+        title={course.title} 
+        onBack={onBack} 
+        rightElement={
+          <button className="p-1">
+            <MessageSquare className="w-6 h-6 text-orange-500" />
+          </button>
+        }
+      />
+
+      {/* Course Card Horizontal */}
       <div className="px-4 py-6">
         <div className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col md:flex-row">
           <div className="relative w-full md:w-1/2 aspect-video bg-gray-100">
             <img 
-              src="https://picsum.photos/seed/ielts-course/400/225" 
+              src={`https://picsum.photos/seed/${course.seed || 'course'}/400/225`} 
               alt="Course" 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
@@ -259,39 +425,105 @@ const IELTSPrepPage = ({ onBack }: { onBack: () => void }) => {
           </div>
           <div className="p-4 flex-1 flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 leading-tight">Hitalk雅思外教1v1口语陪练</h3>
-              <p className="text-xs text-gray-400 mt-1">雅思前考官1v1深度陪练，针对性突破口语薄弱项，助力高分</p>
+              <h3 className="text-lg font-bold text-gray-900 leading-tight">{course.title}</h3>
+              <p className="text-xs text-gray-400 mt-1">{course.subtitle || '资深名师深度陪练，针对性突破薄弱项，助力高分'}</p>
               <div className="mt-3 flex items-baseline gap-1">
                 <span className="text-orange-500 text-sm font-bold">¥</span>
-                <span className="text-orange-500 text-2xl font-bold">399</span>
+                <span className="text-orange-500 text-2xl font-bold">{course.price || '399'}</span>
               </div>
               <div className="mt-2 flex items-center gap-4 text-xs text-gray-400">
                 <span>班次</span>
-                <span>45课时 | 报班即学 至 有效期90天</span>
+                <span>{course.lessons || '45课时'} | 报班即学 至 有效期90天</span>
               </div>
             </div>
             <div className="mt-4 flex gap-3">
-              <button className="flex-1 py-2.5 bg-orange-500 text-white rounded-lg font-bold text-sm shadow-lg shadow-orange-200 active:bg-orange-600">
+              <button 
+                onClick={() => setShowPayment(true)}
+                className="w-full py-2.5 bg-orange-500 text-white rounded-lg font-bold text-sm shadow-lg shadow-orange-200 active:bg-orange-600"
+              >
                 立即购买
-              </button>
-              <button className="flex-1 py-2.5 border border-orange-500 text-orange-500 rounded-lg font-bold text-sm active:bg-orange-50">
-                课程咨询
               </button>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Payment Modal */}
+      <AnimatePresence>
+        {showPayment && (
+          <div className="fixed inset-0 z-[100] flex items-end justify-center">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPayment(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative w-full max-w-md bg-white rounded-t-3xl p-6 pb-10"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-gray-900">选择支付方式</h3>
+                <button onClick={() => setShowPayment(false)} className="text-gray-400">
+                  <ChevronLeft className="w-6 h-6 rotate-[-90deg]" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <button className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl active:bg-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center">
+                      <MessageCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-bold text-gray-900">微信支付</p>
+                      <p className="text-xs text-gray-400">推荐微信用户使用</p>
+                    </div>
+                  </div>
+                  <div className="w-5 h-5 rounded-full border-2 border-orange-500 flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 bg-orange-500 rounded-full" />
+                  </div>
+                </button>
+
+                <button className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl active:bg-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Globe className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-bold text-gray-900">支付宝支付</p>
+                      <p className="text-xs text-gray-400">支持花呗分期</p>
+                    </div>
+                  </div>
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-200" />
+                </button>
+              </div>
+
+              <div className="mt-8 flex items-center justify-between px-2">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-gray-400 text-sm">合计:</span>
+                  <span className="text-orange-500 text-sm font-bold">¥</span>
+                  <span className="text-orange-500 text-2xl font-bold">{course.price || '399'}</span>
+                </div>
+                <button className="px-10 py-3 bg-orange-500 text-white rounded-full font-bold shadow-lg shadow-orange-200 active:bg-orange-600">
+                  确认支付
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Pain Points Section */}
       <div className="px-4 mt-4">
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
           <h3 className="text-xl font-bold text-gray-900 text-center mb-6">你是否面临这些困境?</h3>
           <div className="space-y-5">
-            {[
-              "每次考试口语都是5.5分，流利度、词汇、语法、发音总有一项拖后腿？",
-              "回答生硬，逻辑跳跃，无法让考官理解你的真实水平？",
-              "自学或大班课无法获得针对个人问题的精准指导，进步缓慢？"
-            ].map((text, i) => (
+            {painPoints.map((text, i) => (
               <div key={i} className="flex gap-4 items-start">
                 <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-rose-500 text-xs font-bold">!</span>
@@ -309,13 +541,13 @@ const IELTSPrepPage = ({ onBack }: { onBack: () => void }) => {
           <div className="relative z-10">
             <p className="text-indigo-200 text-sm font-medium tracking-widest uppercase">这样的你适合</p>
             <h2 className="text-3xl font-black mt-2">沪江网校</h2>
-            <h3 className="text-xl font-bold mt-1 text-indigo-100">雅思口语考前陪练1V1直播课</h3>
+            <h3 className="text-xl font-bold mt-1 text-indigo-100">{solutionTitle}</h3>
             <div className="mt-6 flex gap-4">
               <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold border border-white/20">考前直击</div>
               <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold border border-white/20">针对性提分</div>
             </div>
             <p className="mt-6 text-sm leading-relaxed text-indigo-50">
-              助你构建即时应答能力与逻辑思维体系，从容应对口语难题
+              助你构建即时应答能力与逻辑思维体系，从容应对各种难题
             </p>
           </div>
           <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
@@ -330,7 +562,7 @@ const IELTSPrepPage = ({ onBack }: { onBack: () => void }) => {
         <h3 className="text-lg font-bold text-gray-900 mb-4">课程亮点</h3>
         <div className="grid grid-cols-2 gap-4">
           {[
-            { title: '资深外教', desc: '1V1口语提升陪练', icon: <Users className="w-5 h-5" /> },
+            { title: '资深名师', desc: '1V1能力提升陪练', icon: <Users className="w-5 h-5" /> },
             { title: '纠正文法', desc: '纠正发音语法', icon: <MessageSquare className="w-5 h-5" /> },
             { title: '提高流利度', desc: '梳理思路', icon: <Zap className="w-5 h-5" /> },
             { title: '优化思路', desc: '词汇句式升级', icon: <Star className="w-5 h-5" /> },
@@ -353,7 +585,7 @@ const IELTSPrepPage = ({ onBack }: { onBack: () => void }) => {
 
       {/* Teacher Quality */}
       <div className="px-4 mt-10">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">我们的外教</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">我们的师资</h3>
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600">
@@ -361,13 +593,13 @@ const IELTSPrepPage = ({ onBack }: { onBack: () => void }) => {
             </div>
             <div>
               <h4 className="font-bold text-gray-900 text-lg">全球教学资质认证</h4>
-              <p className="text-xs text-gray-400">教学经验丰富，严选精英外教</p>
+              <p className="text-xs text-gray-400">教学经验丰富，严选精英师资</p>
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4">
             {[
-              '来自英语为官方语言的国家',
-              'TESOL、TEFL等专业教学资质认证',
+              isIELTS ? '来自英语为官方语言的国家' : isJapan ? '来自日本本土或拥有多年留日经验' : '来自韩国本土或拥有多年留韩经验',
+              '拥有专业教学资质认证',
               '经过6层以上严格面试筛选',
               '经系统、专业培训后上岗',
               '学员真实评价考核，全程监督教学质量',
@@ -385,10 +617,10 @@ const IELTSPrepPage = ({ onBack }: { onBack: () => void }) => {
       {/* Marketing Images Gallery */}
       <div className="px-4 mt-10 space-y-4">
         <div className="rounded-2xl overflow-hidden shadow-sm">
-          <img src="https://picsum.photos/seed/ielts-marketing-1/800/400" alt="Marketing 1" className="w-full" referrerPolicy="no-referrer" />
+          <img src={`https://picsum.photos/seed/${course.seed}-m1/800/400`} alt="Marketing 1" className="w-full" referrerPolicy="no-referrer" />
         </div>
         <div className="rounded-2xl overflow-hidden shadow-sm">
-          <img src="https://picsum.photos/seed/ielts-marketing-2/800/400" alt="Marketing 2" className="w-full" referrerPolicy="no-referrer" />
+          <img src={`https://picsum.photos/seed/${course.seed}-m2/800/400`} alt="Marketing 2" className="w-full" referrerPolicy="no-referrer" />
         </div>
       </div>
     </div>
@@ -397,7 +629,18 @@ const IELTSPrepPage = ({ onBack }: { onBack: () => void }) => {
 
 // --- Page: Japan Study ---
 
-const JapanStudyPage = ({ onBack }: { onBack: () => void }) => {
+const JapanStudyPage = ({ onBack, onSelectCourse }: { onBack: () => void; onSelectCourse: (course: Course) => void }) => {
+  const courses: Course[] = [
+    { id: 'jp-n1', title: '日语N1备考直通车（专项强化+刷题+直播押题）', tags: ['N1', '直播'], icon: 'N1', seed: 'jp-n1', type: 'japan' },
+    { id: 'jp-n2', title: '日语N2备考直通车（专项强化+刷题+直播押题）', tags: ['N2', '直播'], icon: 'N2', seed: 'jp-n2', type: 'japan' },
+    { id: 'jp-n3', title: '日语N3备考直通车（专项强化+刷题+直播押题）', tags: ['N3', '直播'], icon: 'N3', seed: 'jp-n3', type: 'japan' },
+    { id: 'jp-custom', title: '赴日留学安心定制班', tags: ['定制', '留学'], icon: '留', seed: 'jp-custom', type: 'japan' },
+    { id: 'kr-life', title: '韩语生活会话入门至流畅【双年特惠班】', tags: ['韩语', '特惠'], icon: '韩', seed: 'kr-life', type: 'korea' },
+    { id: 'kr-vip', title: '韩语入门至初级VIP【1V1班】', tags: ['VIP', '1V1'], icon: 'V', seed: 'kr-vip', type: 'korea' },
+    { id: 'kr-topik', title: '韩语入门至TOPIK中级【随到随学班】', tags: ['TOPIK', '中级'], icon: 'T', seed: 'kr-topik', type: 'korea' },
+    { id: 'kr-adv', title: '韩语入门至高级VIP【方案定制】', tags: ['高级', '定制'], icon: '高', seed: 'kr-adv', type: 'korea' },
+  ];
+
   return (
     <div className="bg-gray-50 min-h-screen pb-10">
       <Header title="日韩留学" onBack={onBack} />
@@ -419,19 +662,30 @@ const JapanStudyPage = ({ onBack }: { onBack: () => void }) => {
       <div className="px-4 mb-6">
         <div className="grid grid-cols-2 gap-4">
           {[
-            { title: '日语N1/N2核心词汇精讲', lessons: 45, views: '120.5万', tag: '日语考级', seed: 'japan-vocab' },
-            { title: '日本名校SGU项目申请全攻略', lessons: 12, views: '85.2万', tag: '留学申请', seed: 'japan-uni' },
-            { title: 'EJU留考文综核心考点', lessons: 38, views: '64.8万', tag: '留考特训', seed: 'japan-exam' },
-            { title: '日本留学生活指南：从入境到租房', lessons: 15, views: '210.3万', tag: '生活指导', seed: 'japan-life' },
+            { id: 'jp-rec-1', title: '日语N1/N2核心词汇精讲', lessons: '45课时', views: '120.5万', tag: '日语考级', seed: 'japan-vocab', type: 'japan' as const },
+            { id: 'jp-rec-2', title: '日本名校SGU项目申请全攻略', lessons: '12课时', views: '85.2万', tag: '留学申请', seed: 'japan-uni', type: 'japan' as const },
+            { id: 'jp-rec-3', title: 'EJU留考文综核心考点', lessons: '38课时', views: '64.8万', tag: '留考特训', seed: 'japan-exam', type: 'japan' as const },
+            { id: 'jp-rec-4', title: '日本留学生活指南：从入境到租房', lessons: '15课时', views: '210.3万', tag: '生活指导', seed: 'japan-life', type: 'japan' as const },
           ].map((item, idx) => (
-            <div key={idx} className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col">
+            <div 
+              key={idx} 
+              onClick={() => onSelectCourse({ 
+                id: item.id, 
+                title: item.title, 
+                lessons: item.lessons, 
+                seed: item.seed, 
+                type: item.type,
+                tags: [item.tag, '录播课']
+              })}
+              className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col active:scale-95 transition-transform cursor-pointer"
+            >
               <div className="relative aspect-video bg-gray-100">
                 <img src={`https://picsum.photos/seed/${item.seed}/400/225`} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 <div className="absolute top-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm flex items-center gap-1">
                   <Users className="w-2.5 h-2.5" /> {item.views}
                 </div>
                 <div className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
-                  {item.lessons}课时
+                  {item.lessons}
                 </div>
               </div>
               <div className="p-3 flex-1 flex flex-col justify-between">
@@ -450,24 +704,19 @@ const JapanStudyPage = ({ onBack }: { onBack: () => void }) => {
       <SectionTitle title="直播课&混播课" />
       <div className="px-4 mb-6">
         <div className="grid grid-cols-2 gap-4">
-          {[
-            { title: '日语N1备考直通车（专项强化+刷题+直播押题）', tags: ['N1', '直播'], icon: 'N1' },
-            { title: '日语N2备考直通车（专项强化+刷题+直播押题）', tags: ['N2', '直播'], icon: 'N2' },
-            { title: '日语N3备考直通车（专项强化+刷题+直播押题）', tags: ['N3', '直播'], icon: 'N3' },
-            { title: '赴日留学安心定制班', tags: ['定制', '留学'], icon: '留' },
-            { title: '韩语生活会话入门至流畅【双年特惠班】', tags: ['韩语', '特惠'], icon: '韩' },
-            { title: '韩语入门至初级VIP【1V1班】', tags: ['VIP', '1V1'], icon: 'V' },
-            { title: '韩语入门至TOPIK中级【随到随学班】', tags: ['TOPIK', '中级'], icon: 'T' },
-            { title: '韩语入门至高级VIP【方案定制】', tags: ['高级', '定制'], icon: '高' },
-          ].map((item, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+          {courses.map((item, idx) => (
+            <div 
+              key={idx} 
+              onClick={() => onSelectCourse(item)}
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex flex-col justify-between min-h-[160px] relative overflow-hidden active:scale-95 transition-transform cursor-pointer"
+            >
                <div className="absolute -right-2 -top-2 opacity-5 text-6xl font-black select-none">
                  {item.icon}
                </div>
                <div>
                 <h4 className="text-sm font-bold text-gray-800 leading-snug">{item.title}</h4>
                 <div className="mt-3 flex flex-wrap gap-1">
-                  {item.tags.map(tag => (
+                  {item.tags?.map(tag => (
                     <span key={tag} className="px-1.5 py-0.5 border border-orange-200 text-[10px] text-orange-400 rounded">
                       {tag}
                     </span>
@@ -475,7 +724,7 @@ const JapanStudyPage = ({ onBack }: { onBack: () => void }) => {
                 </div>
                </div>
                <div className="mt-4">
-                 <button className="w-full py-1.5 border border-orange-300 text-orange-400 text-xs rounded-full font-medium active:bg-orange-50">
+                 <button className="w-full py-1.5 border border-orange-300 text-orange-400 text-xs rounded-full font-medium">
                    查看详情
                  </button>
                  <div className="mt-2 pt-2 border-t border-gray-50 flex justify-between items-center text-[10px] text-gray-400">
@@ -548,6 +797,14 @@ const HTTeachersPage = ({ onBack }: { onBack: () => void }) => {
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [previousPage, setPreviousPage] = useState<Page>('home');
+
+  const handleSelectCourse = (course: Course, from: Page) => {
+    setSelectedCourse(course);
+    setPreviousPage(from);
+    setCurrentPage('course-detail');
+  };
 
   return (
     <div className="max-w-md mx-auto bg-white shadow-2xl min-h-screen relative overflow-x-hidden font-sans">
@@ -571,7 +828,10 @@ export default function App() {
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.3 }}
           >
-            <IELTSPrepPage onBack={() => setCurrentPage('home')} />
+            <IELTSPrepPage 
+              onBack={() => setCurrentPage('home')} 
+              onSelectCourse={(c) => handleSelectCourse(c, 'ielts')}
+            />
           </motion.div>
         )}
         {currentPage === 'japan' && (
@@ -582,7 +842,10 @@ export default function App() {
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.3 }}
           >
-            <JapanStudyPage onBack={() => setCurrentPage('home')} />
+            <JapanStudyPage 
+              onBack={() => setCurrentPage('home')} 
+              onSelectCourse={(c) => handleSelectCourse(c, 'japan')}
+            />
           </motion.div>
         )}
         {currentPage === 'ht-teachers' && (
@@ -594,6 +857,20 @@ export default function App() {
             transition={{ duration: 0.3 }}
           >
             <HTTeachersPage onBack={() => setCurrentPage('home')} />
+          </motion.div>
+        )}
+        {currentPage === 'course-detail' && selectedCourse && (
+          <motion.div
+            key="course-detail"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CourseDetailPage 
+              course={selectedCourse} 
+              onBack={() => setCurrentPage(previousPage)} 
+            />
           </motion.div>
         )}
       </AnimatePresence>
