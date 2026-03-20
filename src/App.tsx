@@ -25,7 +25,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 // --- Types ---
 
-type Page = 'home' | 'ielts' | 'japan' | 'ht-teachers' | 'course-detail';
+type Page = 'home' | 'oral' | 'ielts' | 'study-abroad' | 'minor-lang' | 'ht-teachers' | 'course-detail';
 
 interface Course {
   id: string;
@@ -36,7 +36,8 @@ interface Course {
   seed?: string;
   tags?: string[];
   icon?: string;
-  type?: 'ielts' | 'japan' | 'korea';
+  type?: 'ielts' | 'japan' | 'korea' | 'minor' | 'oral';
+  isMixed?: boolean;
 }
 
 interface KingKongItem {
@@ -49,13 +50,13 @@ interface KingKongItem {
 // --- Constants ---
 
 const KING_KONG_ITEMS: KingKongItem[] = [
-  { id: 'ielts', label: '雅思备考', icon: <BookOpen className="w-6 h-6 text-white" />, color: 'bg-purple-500' },
-  { id: 'japan', label: '日韩留学', icon: <Globe className="w-6 h-6 text-white" />, color: 'bg-yellow-500' },
-  { id: 'kids', label: '运营配置3', icon: <Baby className="w-6 h-6 text-white" />, color: 'bg-pink-500' },
-  { id: 'oral', label: '运营配置4', icon: <MessageCircle className="w-6 h-6 text-white" />, color: 'bg-blue-400' },
-  { id: 'op5', label: '运营配置5', icon: <Settings className="w-6 h-6 text-white" />, color: 'bg-emerald-500' },
+  { id: 'oral', label: '英语口语', icon: <MessageCircle className="w-6 h-6 text-white" />, color: 'bg-blue-400' },
+  { id: 'ielts', label: '雅思课程', icon: <BookOpen className="w-6 h-6 text-white" />, color: 'bg-purple-500' },
+  { id: 'study-abroad', label: '日韩留学', icon: <Globe className="w-6 h-6 text-white" />, color: 'bg-yellow-500' },
+  { id: 'minor-lang', label: '小语种课程', icon: <Globe className="w-6 h-6 text-white" />, color: 'bg-emerald-500' },
+  { id: 'op3', label: '运营配置3', icon: <Settings className="w-6 h-6 text-white" />, color: 'bg-emerald-500' },
   { id: 'ht-teachers', label: 'HT-外教课程', icon: <Star className="w-6 h-6 text-white" />, color: 'bg-orange-400' },
-  { id: 'op7', label: '运营配置7', icon: <Heart className="w-6 h-6 text-white" />, color: 'bg-rose-400' },
+  { id: 'op4', label: '运营配置4', icon: <Heart className="w-6 h-6 text-white" />, color: 'bg-rose-400' },
   { id: 'op8', label: '运营配置8', icon: <Zap className="w-6 h-6 text-white" />, color: 'bg-indigo-400' },
 ];
 
@@ -172,8 +173,10 @@ const HomePage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
             <button
               key={item.id}
               onClick={() => {
+                if (item.id === 'oral') onNavigate('oral');
                 if (item.id === 'ielts') onNavigate('ielts');
-                if (item.id === 'japan') onNavigate('japan');
+                if (item.id === 'study-abroad') onNavigate('study-abroad');
+                if (item.id === 'minor-lang') onNavigate('minor-lang');
                 if (item.id === 'ht-teachers') onNavigate('ht-teachers');
               }}
               className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
@@ -253,120 +256,104 @@ const HomePage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
   );
 };
 
-// --- Page: IELTS Prep ---
+// --- Page: Course List ---
 
-// --- Page: IELTS Prep ---
-
-const IELTSPrepPage = ({ onBack, onSelectCourse }: { onBack: () => void; onSelectCourse: (course: Course) => void }) => {
-  const courses: Course[] = [
-    { id: 'ielts-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['直播课', '欧美1v1'], icon: '欧', seed: 'ielts-eu', type: 'ielts' },
-    { id: 'ielts-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['直播课', '菲教1v1'], icon: '菲', seed: 'ielts-ph', type: 'ielts' },
-    { id: 'ielts-kids', title: 'kids外教1v1（所有课时包集合页）', tags: ['直播课', '少儿1v1'], icon: 'K', seed: 'ielts-kids', type: 'ielts' },
-    { id: 'ielts-biz', title: '流利商务口语', tags: ['录播课', '商务实战'], icon: '商', seed: 'ielts-biz', type: 'ielts' },
-    { id: 'ielts-life', title: '生活口语达人训练营', tags: ['录播课', '口语提升'], icon: '生', seed: 'ielts-life', type: 'ielts' },
-    { id: 'ielts-hitalk', title: 'Hitalk雅思外教1v1口语陪练', tags: ['直播课', '口语陪练'], icon: 'H', seed: 'ielts-hitalk', type: 'ielts' },
-    { id: 'ielts-premium', title: '雅思1v1精品班（所有课时包集合页）', tags: ['直播课', '精品1v1'], icon: '精', seed: 'ielts-premium', type: 'ielts' },
-    { id: 'ielts-vip', title: '雅思7分VIP班（定制班）', tags: ['混播课', '方案定制'], icon: 'V', seed: 'ielts-vip', type: 'ielts' },
-    { id: 'ielts-65', title: '初级水平直达雅思6.5分', tags: ['录播课', '零基础'], icon: '6.5', seed: 'ielts-65', type: 'ielts' },
-  ];
-
+const CourseListPage = ({ 
+  title, 
+  mixedCourses, 
+  recordedCourses, 
+  onBack, 
+  onSelectCourse 
+}: { 
+  title: string; 
+  mixedCourses: Course[]; 
+  recordedCourses: Course[]; 
+  onBack: () => void; 
+  onSelectCourse: (course: Course) => void 
+}) => {
   return (
     <div className="bg-gray-50 min-h-screen pb-10">
-      <Header title="雅思备考" onBack={onBack} />
+      <Header title={title} onBack={onBack} />
       
       {/* Banner */}
       <div className="px-4 py-4">
         <div className="w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-md">
           <img 
-            src="https://picsum.photos/seed/ielts-banner/800/400" 
-            alt="IELTS Banner" 
+            src={`https://picsum.photos/seed/${title}/800/400`} 
+            alt="Banner" 
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
           />
         </div>
       </div>
 
-      {/* Recorded Courses Grid */}
-      <SectionTitle title="热门录播课" extra="更多" />
-      <div className="px-4 mb-6">
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { id: 'ielts-rec-1', title: '雅思听力高分突破：场景词汇全掌握', lessons: '24课时', views: '85.6万', tag: '听力特训', seed: 'ielts-listening', type: 'ielts' as const },
-            { id: 'ielts-rec-2', title: '雅思阅读真题精讲：长难句破解', lessons: '32课时', views: '92.1万', tag: '阅读提分', seed: 'ielts-reading', type: 'ielts' as const },
-            { id: 'ielts-rec-3', title: '雅思写作高分范文：逻辑与表达', lessons: '28课时', views: '78.4万', tag: '写作精讲', seed: 'ielts-writing', type: 'ielts' as const },
-            { id: 'ielts-rec-4', title: '雅思口语预测：当季热点话题', lessons: '15课时', views: '112.3万', tag: '口语预测', seed: 'ielts-speaking', type: 'ielts' as const },
-          ].map((item, idx) => (
-            <div 
-              key={idx} 
-              onClick={() => onSelectCourse({ 
-                id: item.id, 
-                title: item.title, 
-                lessons: item.lessons, 
-                seed: item.seed, 
-                type: item.type,
-                tags: [item.tag, '录播课']
-              })}
-              className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col active:scale-95 transition-transform cursor-pointer"
-            >
-              <div className="relative aspect-video bg-gray-100">
-                <img src={`https://picsum.photos/seed/${item.seed}/400/225`} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                <div className="absolute top-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm flex items-center gap-1">
-                  <Users className="w-2.5 h-2.5" /> {item.views}
+      {/* Mixed Courses */}
+      {mixedCourses.length > 0 && (
+        <>
+          <SectionTitle title="混播课" />
+          <div className="px-4 mb-6">
+            <div className="grid grid-cols-2 gap-4">
+              {mixedCourses.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  onClick={() => onSelectCourse(item)}
+                  className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex flex-col justify-between min-h-[160px] relative overflow-hidden active:scale-95 transition-transform cursor-pointer"
+                >
+                  <div className="absolute -right-2 -top-2 opacity-5 text-6xl font-black select-none">
+                    {item.icon || item.title[0]}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-800 leading-snug">{item.title}</h4>
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {item.tags?.map(tag => (
+                        <span key={tag} className="px-1.5 py-0.5 border border-orange-200 text-[10px] text-orange-400 rounded">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <button className="w-full py-1.5 border border-orange-300 text-orange-400 text-xs rounded-full font-medium">
+                      查看详情
+                    </button>
+                  </div>
                 </div>
-                <div className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
-                  {item.lessons}
-                </div>
-              </div>
-              <div className="p-3 flex-1 flex flex-col justify-between">
-                <h4 className="text-xs font-bold text-gray-800 line-clamp-2 leading-tight">{item.title}</h4>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-[10px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">{item.tag}</span>
-                  <span className="text-[10px] text-rose-500 font-medium">高分必看</span>
-                </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
 
-      <SectionTitle title="直播课&混播课" />
-      <div className="px-4 mb-6">
-        <div className="grid grid-cols-2 gap-4">
-          {courses.map((item, idx) => (
-            <div 
-              key={idx} 
-              onClick={() => onSelectCourse(item)}
-              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex flex-col justify-between min-h-[160px] relative overflow-hidden active:scale-95 transition-transform cursor-pointer"
-            >
-               <div className="absolute -right-2 -top-2 opacity-5 text-6xl font-black select-none">
-                 {item.icon}
-               </div>
-               <div>
-                <h4 className="text-sm font-bold text-gray-800 leading-snug">{item.title}</h4>
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {item.tags?.map(tag => (
-                    <span key={tag} className="px-1.5 py-0.5 border border-orange-200 text-[10px] text-orange-400 rounded">
-                      {tag}
-                    </span>
-                  ))}
+      {/* Recorded Courses */}
+      {recordedCourses.length > 0 && (
+        <>
+          <SectionTitle title="录播课" extra="更多" />
+          <div className="px-4 mb-6">
+            <div className="grid grid-cols-2 gap-4">
+              {recordedCourses.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  onClick={() => onSelectCourse(item)}
+                  className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col active:scale-95 transition-transform cursor-pointer"
+                >
+                  <div className="relative aspect-video bg-gray-100">
+                    <img src={`https://picsum.photos/seed/${item.seed || item.id}/400/225`} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <div className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                      {item.lessons || '32课时'}
+                    </div>
+                  </div>
+                  <div className="p-3 flex-1 flex flex-col justify-between">
+                    <h4 className="text-xs font-bold text-gray-800 line-clamp-2 leading-tight">{item.title}</h4>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-[10px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">录播课</span>
+                    </div>
+                  </div>
                 </div>
-               </div>
-               <div className="mt-4">
-                 <button className="w-full py-1.5 border border-orange-300 text-orange-400 text-xs rounded-full font-medium">
-                   查看详情
-                 </button>
-                 <div className="mt-2 pt-2 border-t border-gray-50 flex justify-between items-center text-[10px] text-gray-400">
-                   <span>好评率: 99%</span>
-                   <div className="flex items-center gap-0.5">
-                     <MessageSquare className="w-3 h-3" />
-                     <span>免费咨询</span>
-                   </div>
-                 </div>
-               </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -627,121 +614,7 @@ const CourseDetailPage = ({ course, onBack }: { course: Course; onBack: () => vo
   );
 };
 
-// --- Page: Japan Study ---
-
-const JapanStudyPage = ({ onBack, onSelectCourse }: { onBack: () => void; onSelectCourse: (course: Course) => void }) => {
-  const courses: Course[] = [
-    { id: 'jp-n1', title: '日语N1备考直通车（专项强化+刷题+直播押题）', tags: ['N1', '直播'], icon: 'N1', seed: 'jp-n1', type: 'japan' },
-    { id: 'jp-n2', title: '日语N2备考直通车（专项强化+刷题+直播押题）', tags: ['N2', '直播'], icon: 'N2', seed: 'jp-n2', type: 'japan' },
-    { id: 'jp-n3', title: '日语N3备考直通车（专项强化+刷题+直播押题）', tags: ['N3', '直播'], icon: 'N3', seed: 'jp-n3', type: 'japan' },
-    { id: 'jp-custom', title: '赴日留学安心定制班', tags: ['定制', '留学'], icon: '留', seed: 'jp-custom', type: 'japan' },
-    { id: 'kr-life', title: '韩语生活会话入门至流畅【双年特惠班】', tags: ['韩语', '特惠'], icon: '韩', seed: 'kr-life', type: 'korea' },
-    { id: 'kr-vip', title: '韩语入门至初级VIP【1V1班】', tags: ['VIP', '1V1'], icon: 'V', seed: 'kr-vip', type: 'korea' },
-    { id: 'kr-topik', title: '韩语入门至TOPIK中级【随到随学班】', tags: ['TOPIK', '中级'], icon: 'T', seed: 'kr-topik', type: 'korea' },
-    { id: 'kr-adv', title: '韩语入门至高级VIP【方案定制】', tags: ['高级', '定制'], icon: '高', seed: 'kr-adv', type: 'korea' },
-  ];
-
-  return (
-    <div className="bg-gray-50 min-h-screen pb-10">
-      <Header title="日韩留学" onBack={onBack} />
-
-      {/* Banner */}
-      <div className="px-4 py-4">
-        <div className="w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-md">
-          <img 
-            src="https://picsum.photos/seed/japan-study-tokyo/800/400" 
-            alt="Japan Study Banner" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-      </div>
-
-      {/* Recorded Courses Grid (4 items - Fig 5) */}
-      <SectionTitle title="热门录播课" extra="更多" />
-      <div className="px-4 mb-6">
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { id: 'jp-rec-1', title: '日语N1/N2核心词汇精讲', lessons: '45课时', views: '120.5万', tag: '日语考级', seed: 'japan-vocab', type: 'japan' as const },
-            { id: 'jp-rec-2', title: '日本名校SGU项目申请全攻略', lessons: '12课时', views: '85.2万', tag: '留学申请', seed: 'japan-uni', type: 'japan' as const },
-            { id: 'jp-rec-3', title: 'EJU留考文综核心考点', lessons: '38课时', views: '64.8万', tag: '留考特训', seed: 'japan-exam', type: 'japan' as const },
-            { id: 'jp-rec-4', title: '日本留学生活指南：从入境到租房', lessons: '15课时', views: '210.3万', tag: '生活指导', seed: 'japan-life', type: 'japan' as const },
-          ].map((item, idx) => (
-            <div 
-              key={idx} 
-              onClick={() => onSelectCourse({ 
-                id: item.id, 
-                title: item.title, 
-                lessons: item.lessons, 
-                seed: item.seed, 
-                type: item.type,
-                tags: [item.tag, '录播课']
-              })}
-              className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col active:scale-95 transition-transform cursor-pointer"
-            >
-              <div className="relative aspect-video bg-gray-100">
-                <img src={`https://picsum.photos/seed/${item.seed}/400/225`} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                <div className="absolute top-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm flex items-center gap-1">
-                  <Users className="w-2.5 h-2.5" /> {item.views}
-                </div>
-                <div className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
-                  {item.lessons}
-                </div>
-              </div>
-              <div className="p-3 flex-1 flex flex-col justify-between">
-                <h4 className="text-xs font-bold text-gray-800 line-clamp-2 leading-tight">{item.title}</h4>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">{item.tag}</span>
-                  <span className="text-[10px] text-rose-500 font-medium">百万播放</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Featured Courses Grid (8 items) */}
-      <SectionTitle title="直播课&混播课" />
-      <div className="px-4 mb-6">
-        <div className="grid grid-cols-2 gap-4">
-          {courses.map((item, idx) => (
-            <div 
-              key={idx} 
-              onClick={() => onSelectCourse(item)}
-              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex flex-col justify-between min-h-[160px] relative overflow-hidden active:scale-95 transition-transform cursor-pointer"
-            >
-               <div className="absolute -right-2 -top-2 opacity-5 text-6xl font-black select-none">
-                 {item.icon}
-               </div>
-               <div>
-                <h4 className="text-sm font-bold text-gray-800 leading-snug">{item.title}</h4>
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {item.tags?.map(tag => (
-                    <span key={tag} className="px-1.5 py-0.5 border border-orange-200 text-[10px] text-orange-400 rounded">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-               </div>
-               <div className="mt-4">
-                 <button className="w-full py-1.5 border border-orange-300 text-orange-400 text-xs rounded-full font-medium">
-                   查看详情
-                 </button>
-                 <div className="mt-2 pt-2 border-t border-gray-50 flex justify-between items-center text-[10px] text-gray-400">
-                   <span>好评率: 98%</span>
-                   <div className="flex items-center gap-0.5">
-                     <MessageSquare className="w-3 h-3" />
-                     <span>免费咨询</span>
-                   </div>
-                 </div>
-               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+// --- Page: Japan Study --- (Removed specialized page)
 
 // --- Page: HT Teachers ---
 
@@ -806,6 +679,63 @@ export default function App() {
     setCurrentPage('course-detail');
   };
 
+  const oralMixed: Course[] = [
+    { id: 'oral-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['混播课', '欧美1v1'], icon: '欧', seed: 'oral-eu', type: 'oral' },
+    { id: 'oral-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['混播课', '菲教1v1'], icon: '菲', seed: 'oral-ph', type: 'oral' },
+    { id: 'oral-kids', title: 'kids外教1v1（所有课时包集合页）', tags: ['混播课', '少儿1v1'], icon: 'K', seed: 'oral-kids', type: 'oral' },
+  ];
+  const oralRec: Course[] = [
+    { id: 'oral-biz', title: '流利商务口语', tags: ['录播课'], seed: 'oral-biz', type: 'oral' },
+    { id: 'oral-life', title: '生活口语达人训练营', tags: ['录播课'], seed: 'oral-life', type: 'oral' },
+  ];
+
+  const ieltsMixed: Course[] = [];
+  const ieltsRec: Course[] = [
+    { id: 'ielts-hitalk', title: 'Hitalk雅思外教1v1口语陪练', tags: ['录播课', '口语陪练'], seed: 'ielts-hitalk', type: 'ielts' },
+    { id: 'ielts-premium', title: '雅思1v1精品班（所有课时包集合页）', tags: ['录播课', '精品1v1'], seed: 'ielts-premium', type: 'ielts' },
+    { id: 'ielts-vip', title: '雅思7分VIP班（定制班）', tags: ['录播课', '方案定制'], seed: 'ielts-vip', type: 'ielts' },
+    { id: 'ielts-65', title: '初级水平直达雅思6.5分', tags: ['录播课'], seed: 'ielts-65', type: 'ielts' },
+  ];
+
+  const studyAbroadMixed: Course[] = [
+    { id: 'jp-n1', title: '日语N1备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N1'], icon: 'N1', seed: 'jp-n1', type: 'japan' },
+    { id: 'jp-n2', title: '日语N2备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N2'], icon: 'N2', seed: 'jp-n2', type: 'japan' },
+    { id: 'jp-n3', title: '日语N3备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N3'], icon: 'N3', seed: 'jp-n3', type: 'japan' },
+    { id: 'kr-vip-1v1', title: '韩语入门至初级VIP【1V1班】', tags: ['混播课', 'VIP'], icon: 'V', seed: 'kr-vip-1v1', type: 'korea' },
+    { id: 'kr-vip-custom', title: '韩语入门至高级VIP【方案定制】', tags: ['混播课', '定制'], icon: '高', seed: 'kr-vip-custom', type: 'korea' },
+    { id: 'kr-topik', title: '韩语入门至TOPIK中级【随到随学班】', tags: ['混播课', 'TOPIK'], icon: 'T', seed: 'kr-topik', type: 'korea' },
+    { id: 'kr-1v1-custom', title: '韩语1V1【VIP定制班】', tags: ['混播课', '1V1'], icon: '1', seed: 'kr-1v1-custom', type: 'korea' },
+  ];
+  const studyAbroadRec: Course[] = [
+    { id: 'jp-0-n1', title: '新编日语0-N1', tags: ['录播课'], seed: 'jp-0-n1', type: 'japan' },
+    { id: 'jp-biz', title: '商务日语会话', tags: ['录播课'], seed: 'jp-biz', type: 'japan' },
+    { id: 'jp-study-custom', title: '赴日留学安心定制班', tags: ['录播课'], seed: 'jp-study-custom', type: 'japan' },
+    { id: 'kr-life-sale', title: '韩语生活会话入门至流畅【双年特惠班】', tags: ['录播课'], seed: 'kr-life-sale', type: 'korea' },
+  ];
+
+  const minorLangMixed: Course[] = [
+    { id: 'fr-vip-custom', title: '法语零基础至中级（0-A2）VIP【方案定制班】', tags: ['混播课'], icon: '法', seed: 'fr-vip-custom', type: 'minor' },
+    { id: 'es-vip-custom', title: '西语零起点至生活会话1V1强化【学习方案定制】', tags: ['混播课'], icon: '西', seed: 'es-vip-custom', type: 'minor' },
+    { id: 'ru-vip-custom', title: '俄语(0-B2)尊享VIP【方案定制班】', tags: ['混播课'], icon: '俄', seed: 'ru-vip-custom', type: 'minor' },
+    { id: 'fr-1v1', title: '法语1V1【VIP定制班】', tags: ['混播课'], icon: 'F', seed: 'fr-1v1', type: 'minor' },
+    { id: 'de-1v1', title: '德语1V1【VIP定制班】', tags: ['混播课'], icon: 'D', seed: 'de-1v1', type: 'minor' },
+    { id: 'es-1v1', title: '西班牙语1V1【VIP定制班】', tags: ['混播课'], icon: 'S', seed: 'es-1v1', type: 'minor' },
+    { id: 'ru-1v1', title: '俄语1V1【VIP定制班】', tags: ['混播课'], icon: 'R', seed: 'ru-1v1', type: 'minor' },
+    { id: 'it-1v1', title: '意大利语1V1【VIP定制班】', tags: ['混播课'], icon: 'I', seed: 'it-1v1', type: 'minor' },
+    { id: 'th-1v1', title: '泰语1V1【VIP定制班】', tags: ['混播课'], icon: 'T', seed: 'th-1v1', type: 'minor' },
+    { id: 'vi-1v1', title: '越南语1V1【VIP定制班】', tags: ['混播课'], icon: 'V', seed: 'vi-1v1', type: 'minor' },
+    { id: 'ar-1v1', title: '阿拉伯语1V1【VIP定制班】', tags: ['混播课'], icon: 'A', seed: 'ar-1v1', type: 'minor' },
+    { id: 'la-1v1', title: '拉丁语1V1【VIP定制班】', tags: ['混播课'], icon: 'L', seed: 'la-1v1', type: 'minor' },
+    { id: 'yue-1v1', title: '粤语1V1【VIP定制班】', tags: ['混播课'], icon: 'Y', seed: 'yue-1v1', type: 'minor' },
+  ];
+  const minorLangRec: Course[] = [
+    { id: 'fr-0-b2', title: 'E-French法语0-B2语法精讲【随到随学班】', tags: ['录播课'], seed: 'fr-0-b2', type: 'minor' },
+    { id: 'de-0-b1', title: '新版德语零基础至中高级（0-B1）【随到随学班】', tags: ['录播课'], seed: 'de-0-b1', type: 'minor' },
+    { id: 'es-0-a2', title: '【U-Spanish】西班牙语零起点至中级0-A2【随到随学班】', tags: ['录播课'], seed: 'es-0-a2', type: 'minor' },
+    { id: 'ru-0-b1', title: '俄语(0-B1)零基础至中高级【随到随学班】', tags: ['录播课'], seed: 'ru-0-b1', type: 'minor' },
+    { id: 'it-0-a2', title: '意大利语(0-A2)零起点至中级【随到随学班】', tags: ['录播课'], seed: 'it-0-a2', type: 'minor' },
+  ];
+
   return (
     <div className="max-w-md mx-auto bg-white shadow-2xl min-h-screen relative overflow-x-hidden font-sans">
       <AnimatePresence mode="wait">
@@ -820,6 +750,23 @@ export default function App() {
             <HomePage onNavigate={setCurrentPage} />
           </motion.div>
         )}
+        {currentPage === 'oral' && (
+          <motion.div
+            key="oral"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CourseListPage 
+              title="英语口语"
+              mixedCourses={oralMixed}
+              recordedCourses={oralRec}
+              onBack={() => setCurrentPage('home')} 
+              onSelectCourse={(c) => handleSelectCourse(c, 'oral')}
+            />
+          </motion.div>
+        )}
         {currentPage === 'ielts' && (
           <motion.div
             key="ielts"
@@ -828,23 +775,46 @@ export default function App() {
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.3 }}
           >
-            <IELTSPrepPage 
+            <CourseListPage 
+              title="雅思课程"
+              mixedCourses={ieltsMixed}
+              recordedCourses={ieltsRec}
               onBack={() => setCurrentPage('home')} 
               onSelectCourse={(c) => handleSelectCourse(c, 'ielts')}
             />
           </motion.div>
         )}
-        {currentPage === 'japan' && (
+        {currentPage === 'study-abroad' && (
           <motion.div
-            key="japan"
+            key="study-abroad"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.3 }}
           >
-            <JapanStudyPage 
+            <CourseListPage 
+              title="日韩留学"
+              mixedCourses={studyAbroadMixed}
+              recordedCourses={studyAbroadRec}
               onBack={() => setCurrentPage('home')} 
-              onSelectCourse={(c) => handleSelectCourse(c, 'japan')}
+              onSelectCourse={(c) => handleSelectCourse(c, 'study-abroad')}
+            />
+          </motion.div>
+        )}
+        {currentPage === 'minor-lang' && (
+          <motion.div
+            key="minor-lang"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CourseListPage 
+              title="小语种课程"
+              mixedCourses={minorLangMixed}
+              recordedCourses={minorLangRec}
+              onBack={() => setCurrentPage('home')} 
+              onSelectCourse={(c) => handleSelectCourse(c, 'minor-lang')}
             />
           </motion.div>
         )}
