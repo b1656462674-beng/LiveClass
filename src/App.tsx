@@ -263,13 +263,15 @@ const CourseListPage = ({
   mixedCourses, 
   recordedCourses, 
   onBack, 
-  onSelectCourse 
+  onSelectCourse,
+  mixedTitle = "混播课"
 }: { 
   title: string; 
   mixedCourses: Course[]; 
   recordedCourses: Course[]; 
   onBack: () => void; 
-  onSelectCourse: (course: Course) => void 
+  onSelectCourse: (course: Course) => void;
+  mixedTitle?: string;
 }) => {
   return (
     <div className="bg-gray-50 min-h-screen pb-10">
@@ -290,7 +292,7 @@ const CourseListPage = ({
       {/* Mixed Courses */}
       {mixedCourses.length > 0 && (
         <>
-          <SectionTitle title="混播课" />
+          <SectionTitle title={mixedTitle} />
           <div className="px-4 mb-6">
             <div className="grid grid-cols-2 gap-4">
               {mixedCourses.map((item, idx) => (
@@ -338,6 +340,11 @@ const CourseListPage = ({
                 >
                   <div className="relative aspect-video bg-gray-100">
                     <img src={`https://picsum.photos/seed/${item.seed || item.id}/400/225`} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-black/30 rounded-full flex items-center justify-center backdrop-blur-[2px]">
+                        <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                      </div>
+                    </div>
                     <div className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
                       {item.lessons || '32课时'}
                     </div>
@@ -680,9 +687,9 @@ export default function App() {
   };
 
   const oralMixed: Course[] = [
-    { id: 'oral-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['混播课', '欧美1v1'], icon: '欧', seed: 'oral-eu', type: 'oral' },
-    { id: 'oral-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['混播课', '菲教1v1'], icon: '菲', seed: 'oral-ph', type: 'oral' },
-    { id: 'oral-kids', title: 'kids外教1v1（所有课时包集合页）', tags: ['混播课', '少儿1v1'], icon: 'K', seed: 'oral-kids', type: 'oral' },
+    { id: 'oral-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['直播课', '欧美1v1'], icon: '欧', seed: 'oral-eu', type: 'oral' },
+    { id: 'oral-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['直播课', '菲教1v1'], icon: '菲', seed: 'oral-ph', type: 'oral' },
+    { id: 'oral-kids', title: 'kids外教1v1（所有课时包集合页）', tags: ['直播课', '少儿1v1'], icon: 'K', seed: 'oral-kids', type: 'oral' },
   ];
   const oralRec: Course[] = [
     { id: 'oral-biz', title: '流利商务口语', tags: ['录播课'], seed: 'oral-biz', type: 'oral' },
@@ -762,6 +769,7 @@ export default function App() {
               title="英语口语"
               mixedCourses={oralMixed}
               recordedCourses={oralRec}
+              mixedTitle="直播课"
               onBack={() => setCurrentPage('home')} 
               onSelectCourse={(c) => handleSelectCourse(c, 'oral')}
             />
