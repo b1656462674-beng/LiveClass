@@ -265,6 +265,50 @@ const getThumbnailLabel = (item: Course) => {
   return '精选小语种';
 };
 
+const getCourseDescription = (course: Course) => {
+  if (course.subtitle) return course.subtitle;
+  const id = course.id;
+  if (id === 'oral-eu') return '欧美母语外教1对1，浸入式语言环境，打造纯正发音。';
+  if (id === 'oral-ph') return '超高性价比菲律宾外教，高频互动练习，突破口语瓶颈。';
+  if (id === 'oral-kids') return '少儿趣味互动1对1，精选优质外教，激发孩子语言天赋。';
+  if (id === 'oral-life') return '生活情景口语实战，轻松幽默氛围，零基础学员口语救星。';
+  if (id === 'oral-biz') return '职场商务沟通特训，掌握谈判汇报技巧，提升职场竞争力。';
+  if (id === 'ielts-65') return '雅思核心基础班，全科考点精讲，助力基础薄弱直达6.5。';
+  if (id === 'ielts-hitalk') return '外教1对1精细陪练与写作精批，突破口语写作单项弱势。';
+  if (id === 'ielts-premium') return '雅思VIP一对一特训，专属定制提分方案，目标高分直达。';
+  if (id === 'ielts-vip') return '全程名师督学与精细化方案定制，全方位锁定雅思7.0+。';
+  if (id === 'jp-n1') return '日语N1冲刺班，历年真题精解+高频词汇语法点专项辅导。';
+  if (id === 'jp-n2') return '日语N2高效过级班，听说读写全面巩固，强化刷题冲刺。';
+  if (id === 'jp-n3') return '日语N3巩固提高，零基础无缝衔接，奠定扎实中级基础。';
+  if (id === 'jp-0-n1') return '新编日语0-N1长线通关，系统精讲，零基础学员直达高级。';
+  if (id === 'jp-biz') return '商务日语实战，掌握日企社交礼仪与敬语表达，即学即用。';
+  if (id === 'jp-study-custom') return '赴日留学一站式申请辅导，名校定制班型，安全省心。';
+  if (id === 'kr-vip-1v1') return '韩语1对1精细班，名师中韩双语授课，快速掌握日常交流。';
+  if (id === 'kr-vip-custom') return '韩语入门到高级全程定制，专属学习方案，满足个性化需求。';
+  if (id === 'kr-topik') return 'TOPIK中高级考前强化，历年真题精细剖析，高效拿证。';
+  if (id === 'kr-1v1-custom') return '韩语一对一VIP定制，专注攻克发音与会话，实现无障碍交流。';
+  if (id === 'kr-life-sale') return '韩语生活场景会话，高频词汇句型演练，轻松对话无压力。';
+  if (id === 'fr-vip-custom') return '法语0-A2全程VIP方案定制，法语名师保驾护航。';
+  if (id === 'es-vip-custom') return '西班牙语1对1零起点，实用生活场景，轻松掌握基础沟通。';
+  if (id === 'fr-1v1') return '法语外教1对1口语突破，个性化高频互动，提升口语自信。';
+  if (id === 'de-1v1') return '德语1对1欧标进阶课程，针对性辅导，攻克语法难关。';
+  if (id === 'es-1v1') return '西班牙语一对一，资深外教在线纠音，流利说西语。';
+  if (id === 'it-1v1') return '意大利语1对1，针对艺术留学、面签进行精准提升。';
+  if (id === 'fr-0-b2') return '法语0-B2阶梯精讲，涵盖所有核心语法与高频话题。';
+  if (id === 'de-0-b1') return '德语0-B1长线通关，零起点随到随学，名师系统精讲。';
+  if (id === 'es-0-a2') return '西班牙语零起点快速通关，核心会话句式与实用文化。';
+  if (id === 'it-0-a2') return '意大利语日常口语与文化精解，轻松掌握A2欧标内容。';
+  if (id === 'ru-vip-custom') return '俄语高阶VIP定制班，资深外教与中教联合，打造卓越口语。';
+  if (id === 'ru-1v1') return '俄语一对一特训，针对性极强，突破难点句型与发音。';
+  if (id === 'th-1v1') return '泰语1对1日常会话，风趣幽默外教，快速融入泰国文化。';
+  if (id === 'vi-1v1') return '越南语外贸口语，专注实用经贸场景与日常词汇。';
+  if (id === 'ar-1v1') return '阿拉伯语高端1对1，标准语精讲，学术与商务场景。';
+  if (id === 'la-1v1') return '拉丁语经典进修班，精细研读古典文献与核心语法。';
+  if (id === 'yue-1v1') return '粤语日常发音与交流速成，港乐港片场景，轻松开口。';
+  if (id === 'ru-0-b1') return '俄语0-B1随到随学，包含基础发音、句法与高频词汇。';
+  return '精选名师定制课程，资深中外教全天候辅导，全面提分。';
+};
+
 // --- Premium Course Card (Reference Image 1) ---
 
 const CourseCard = ({ 
@@ -285,10 +329,10 @@ const CourseCard = ({
     return (
       <div 
         onClick={onClick}
-        className="bg-white rounded-3xl overflow-hidden border border-gray-100/60 shadow-[0_4px_18px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300 flex p-3 gap-3.5 cursor-pointer hover:translate-y-[-1px] relative group w-full"
+        className="bg-white rounded-2xl overflow-hidden border border-gray-100/60 shadow-[0_4px_16px_rgba(0,0,0,0.015)] hover:shadow-md transition-all duration-300 flex p-2.5 gap-3 cursor-pointer hover:translate-y-[-1px] relative group w-full"
       >
         {/* Left Thumbnail Box (Square Aspect) */}
-        <div className="relative w-28 h-28 flex-shrink-0 bg-gray-50 rounded-2xl overflow-hidden shadow-xs">
+        <div className="relative w-22 h-22 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden shadow-xs">
           <img 
             src={getCourseImage(item.id)} 
             alt={item.title} 
@@ -299,46 +343,50 @@ const CourseCard = ({
           {/* Play Icon overlay for recorded courses */}
           {!isMixed && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-all">
-              <div className="w-8 h-8 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-[1px] shadow-sm">
-                <Play className="w-3.5 h-3.5 text-white fill-white ml-0.5" />
+              <div className="w-7 h-7 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-[1px] shadow-sm">
+                <Play className="w-3 h-3 text-white fill-white ml-0.5" />
               </div>
             </div>
           )}
         </div>
 
         {/* Right Course Details Block */}
-        <div className="flex-1 flex flex-col justify-between min-w-0">
+        <div className="flex-1 flex flex-col justify-between min-w-0 h-22">
           <div>
-            {/* Bold 2-line wrapped title */}
-            <h4 className="text-xs font-bold text-gray-900 leading-snug line-clamp-2 min-h-[32px] tracking-tight group-hover:text-orange-500 transition-colors">
+            {/* Bold 1 or 2 line wrapped title */}
+            <h4 className="text-[13px] font-bold text-gray-900 leading-snug line-clamp-1 tracking-tight group-hover:text-orange-500 transition-colors">
               {item.title}
             </h4>
+
+            {/* Gray course introduction - maximum 1 line */}
+            <p className="text-[11px] text-gray-500 mt-0.5 truncate leading-relaxed">
+              {getCourseDescription(item)}
+            </p>
             
             {/* Tag row with styled badges side-by-side */}
             <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-              {item.tags?.slice(0, 3).map((tag, tIdx) => (
-                <span 
-                  key={tIdx} 
-                  className="inline-block border border-rose-200 bg-rose-50 text-rose-500 text-[8px] font-extrabold px-1.5 py-0.5 rounded-md"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            {/* Rating system showing course score and review counts */}
-            <div className="mt-1.5">
-              <StarRating rating={rating} count={count} />
+              {item.tags
+                ?.filter(tag => tag !== '直播课' && tag !== '录播课' && tag !== '混播课')
+                ?.slice(0, 3)
+                .map((tag, tIdx) => (
+                  <span 
+                    key={tIdx} 
+                    className="inline-block border border-rose-100 bg-rose-50/50 text-rose-500 text-[9px] font-semibold px-1.5 py-0.2 rounded"
+                  >
+                    {tag}
+                  </span>
+                ))
+              }
             </div>
           </div>
 
           {/* Bottom pricing row */}
-          <div className="flex items-center justify-between border-t border-gray-50 pt-2 mt-1">
-            <span className="text-orange-500 font-extrabold text-sm tracking-tight flex items-baseline gap-0.5">
-              <span className="text-[10px] font-bold">¥</span>
+          <div className="flex items-center justify-between border-t border-gray-50 pt-1">
+            <span className="text-orange-500 font-extrabold text-[13px] tracking-tight flex items-baseline gap-0.5">
+              <span className="text-[9px] font-bold">¥</span>
               {item.price || '399'}
             </span>
-            <span className="text-[9px] text-gray-400 font-medium">
+            <span className="text-[10px] text-gray-400 font-medium">
               {item.lessons || '32课时'}
             </span>
           </div>
@@ -375,25 +423,29 @@ const CourseCard = ({
         <div className="flex-1 flex flex-col justify-between min-w-0 px-1 pb-1">
           <div>
             {/* Bold 2-line wrapped title */}
-            <h4 className="text-[11px] font-bold text-gray-900 leading-snug line-clamp-2 min-h-[30px] tracking-tight group-hover:text-orange-500 transition-colors">
+            <h4 className="text-[11px] font-bold text-gray-900 leading-snug line-clamp-2 tracking-tight group-hover:text-orange-500 transition-colors">
               {item.title}
             </h4>
+
+            {/* Gray course introduction - maximum 1 line */}
+            <p className="text-[9px] text-gray-500/90 mt-0.5 truncate leading-relaxed">
+              {getCourseDescription(item)}
+            </p>
             
             {/* Tag row with styled badges side-by-side */}
             <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-              {item.tags?.slice(0, 3).map((tag, tIdx) => (
-                <span 
-                  key={tIdx} 
-                  className="inline-block border border-rose-100 bg-rose-50 text-rose-500 text-[8px] font-extrabold px-1 py-0.2 rounded"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            {/* Rating system showing course score and review counts */}
-            <div className="mt-1">
-              <StarRating rating={rating} count={count} />
+              {item.tags
+                ?.filter(tag => tag !== '直播课' && tag !== '录播课' && tag !== '混播课')
+                ?.slice(0, 3)
+                .map((tag, tIdx) => (
+                  <span 
+                    key={tIdx} 
+                    className="inline-block border border-rose-100 bg-rose-50 text-rose-500 text-[8px] font-extrabold px-1 py-0.2 rounded"
+                  >
+                    {tag}
+                  </span>
+                ))
+              }
             </div>
           </div>
 
@@ -868,12 +920,7 @@ const CourseDetailPage = ({ course, onBack }: { course: Course; onBack: () => vo
           <div className="p-4 flex-1 flex flex-col justify-between">
             <div>
               <h3 className="text-lg font-bold text-gray-900 leading-tight">{course.title}</h3>
-              <p className="text-xs text-gray-400 mt-1">{course.subtitle || '资深名师深度陪练，针对性突破薄弱项，助力高分'}</p>
-              
-              {/* Star Rating Display */}
-              <div className="mt-2.5">
-                <StarRating rating={rating} count={count} />
-              </div>
+              <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{getCourseDescription(course)}</p>
 
               <div className="mt-3 flex items-baseline gap-1">
                 <span className="text-orange-500 text-sm font-bold">¥</span>
