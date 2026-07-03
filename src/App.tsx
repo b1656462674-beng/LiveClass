@@ -19,7 +19,9 @@ import {
   Users,
   Award,
   ChevronRight,
-  Volume2
+  Volume2,
+  LayoutList,
+  Grid
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -150,217 +152,657 @@ const TeacherCard = ({ name, country, lessons, students, rating, bio, seed }: {
   </div>
 );
 
-// --- Page: Home ---
+// --- Course Metadata Generator (Udemy Style, Reference Image 1) ---
 
-const HomePage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
+const getCourseMeta = (course: Course) => {
+  const hash = course.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const teachers = [
+    "Michael Tang", "Sarah Jenkins", "Prof. Kenji Sato", "Ji-Woo Park", 
+    "Elena Petrova", "Dr. Hans Müller", "Sofia Rodriguez", "Claire Dubois",
+    "John Davis", "Lisa Marie", "Yuki Tanaka", "Min-Ho Kim"
+  ];
+  const ratings = [4.6, 4.7, 4.8, 4.9];
+  const reviewCounts = [124, 340, 609, 973, 1502, 843, 620];
+  
+  const teacher = teachers[hash % teachers.length];
+  const rating = ratings[hash % ratings.length];
+  const count = reviewCounts[hash % reviewCounts.length];
+  const avatarSeed = `teacher_${hash % 10}`;
+  
+  return { teacher, rating, count, avatarSeed };
+};
+
+// --- Custom Star Rating Component (Reference Image 1) ---
+
+const StarRating = ({ rating, count }: { rating: number; count: number }) => {
+  const fullStars = Math.floor(rating);
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
-      <div className="bg-white px-4 pt-4 pb-6">
-        <div className="flex justify-between items-center mb-6">
-          <ChevronLeft className="w-6 h-6 text-gray-800" />
-          <div className="flex gap-8 text-lg font-medium text-gray-400">
-            <span>课程</span>
-            <span className="text-gray-900 border-b-2 border-orange-500 pb-1">外教课</span>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center overflow-hidden">
-             <Globe className="w-5 h-5 text-white" />
-          </div>
-        </div>
-
-        {/* King Kong Positions */}
-        <div className="grid grid-cols-4 gap-y-6">
-          {KING_KONG_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                if (item.id === 'oral') onNavigate('oral');
-                if (item.id === 'ielts') onNavigate('ielts');
-                if (item.id === 'study-abroad') onNavigate('study-abroad');
-                if (item.id === 'minor-lang') onNavigate('minor-lang');
-                if (item.id === 'ht-teachers') onNavigate('ht-teachers');
-              }}
-              className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-            >
-              <div className={`${item.color} w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm relative`}>
-                {item.icon}
-              </div>
-              <div className="flex items-center gap-0.5">
-                <span className="text-xs text-gray-700 font-medium text-center px-1">{item.label}</span>
-                {item.id === 'ielts' && (
-                  <div className="bg-orange-500 text-[8px] text-white font-bold px-1 rounded-full border border-white scale-90">
-                    HOT
-                  </div>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <SectionTitle title="精选语伴" subtitle="每天15分钟，与专属语伴固定练习" />
-      
-      <div className="px-4">
-        <div className="bg-emerald-500 rounded-2xl p-4 flex items-center relative overflow-hidden h-32">
-          <div className="z-10">
-            <p className="text-white text-sm opacity-90">15分钟地道韩语聊出来</p>
-            <h3 className="text-white text-2xl font-bold mt-1 flex items-center">
-              韩语精选语伴
-              <div className="bg-white/20 rounded-full p-1 ml-2">
-                <ChevronRight className="w-4 h-4 text-white" />
-              </div>
-            </h3>
-          </div>
-          <img 
-            src="https://picsum.photos/seed/teacher/200/200" 
-            alt="Teacher" 
-            className="absolute right-0 bottom-0 w-32 h-32 object-cover"
-            referrerPolicy="no-referrer"
+    <div className="flex items-center gap-0.5 text-amber-500">
+      <span className="font-bold text-amber-600 text-xs mr-1">{rating.toFixed(1)}</span>
+      <div className="flex items-center">
+        {[...Array(5)].map((_, i) => (
+          <Star 
+            key={i} 
+            className={`w-3 h-3 ${
+              i < fullStars 
+                ? "text-amber-500 fill-amber-500" 
+                : "text-gray-200"
+            }`} 
           />
-        </div>
-      </div>
-
-      <SectionTitle title="语伴畅聊" subtitle="自由预约，不限语种不限语伴" extra="更多" />
-
-      <div className="px-4 grid grid-cols-2 gap-4">
-        {[1, 2].map((i) => (
-          <div key={i} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col items-center text-center">
-            <div className="relative">
-              <img 
-                src={`https://picsum.photos/seed/avatar${i}/150/150`} 
-                alt="Avatar" 
-                className="w-20 h-20 rounded-full object-cover border-2 border-white shadow-md"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-sm">
-                <img src="https://flagcdn.com/w20/us.png" alt="Flag" className="w-4" />
-              </div>
-            </div>
-            <h4 className="mt-3 font-bold text-gray-900">{i === 1 ? 'Den' : 'Graeme'}</h4>
-            <p className="text-xs text-gray-400 mt-1">英语/俄语</p>
-            <p className="text-sm text-gray-700 mt-2 line-clamp-2">Hello friends! I'm here to help...</p>
-            <button className="mt-4 w-full py-2 bg-orange-50 rounded-full text-orange-500 text-sm font-bold active:bg-orange-100">
-              立即预约
-            </button>
-          </div>
         ))}
       </div>
+      <span className="text-gray-400 text-[10px] ml-1">({count}评价)</span>
+    </div>
+  );
+};
 
-      {/* Bottom Nav Placeholder */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 py-3 px-8 flex justify-center items-center">
-        <div className="flex items-center gap-2 text-orange-500 font-bold">
-          <BookOpen className="w-5 h-5" />
-          <span>我的课表</span>
+// --- Highly Curated Course Image Mapper based on course IDs (Unsplash, strictly educational/topic-focused) ---
+
+const getCourseImage = (id: string) => {
+  const imageMap: { [key: string]: string } = {
+    // Oral courses
+    'oral-eu': 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=400&h=225', // Online teacher video call
+    'oral-ph': 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400&h=225', // Smiling online coach
+    'oral-kids': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=400&h=225', // Child with headphones studying
+    'oral-biz': 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=400&h=225', // Professional business desk / teamwork
+    'oral-life': 'https://images.unsplash.com/photo-1543807535-eceef0bc6599?auto=format&fit=crop&q=80&w=400&h=225', // Friends speaking / cafe chatting
+    
+    // IELTS courses
+    'ielts-hitalk': 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&q=80&w=400&h=225', // Notebook & textbook study
+    'ielts-premium': 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400&h=225', // Pen on exam paper / test prep
+    'ielts-vip': 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400&h=225', // Dedicated study desk
+    'ielts-65': 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400&h=225', // Laptop typing / focus
+    
+    // Japanese courses
+    'jp-n1': 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&q=80&w=400&h=225', // Tokyo city cherry blossoms
+    'jp-n2': 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&q=80&w=400&h=225', // Shibuya intersection / modern Tokyo study
+    'jp-n3': 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=400&h=225', // Tokyo Tower
+    'jp-0-n1': 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=400&h=225', // High-end clean classroom
+    'jp-biz': 'https://images.unsplash.com/photo-1491975458574-c902e556e481?auto=format&fit=crop&q=80&w=400&h=225', // Corporate office desk
+    'jp-study-custom': 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=400&h=225', // Premium college library
+    
+    // Korean courses
+    'kr-vip-1v1': 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&q=80&w=400&h=225', // Seoul lights
+    'kr-vip-custom': 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&q=80&w=400&h=225', // Korean street city design
+    'kr-topik': 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=400&h=225', // Group of students studying together
+    'kr-1v1-custom': 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400&h=225', // VIP tailored learning
+    'kr-life-sale': 'https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?auto=format&fit=crop&q=80&w=400&h=225', // Modern cafe dialogue
+    
+    // Minor languages
+    'fr-vip-custom': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=400&h=225', // Paris street cafe
+    'es-vip-custom': 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=crop&q=80&w=400&h=225', // Barcelona style arch / street
+    'ru-vip-custom': 'https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&q=80&w=400&h=225', // University study desk
+    'fr-1v1': 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&q=80&w=400&h=225', // France scenery / language textbook look
+    'de-1v1': 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&q=80&w=400&h=225', // Germany cozy town
+    'es-1v1': 'https://images.unsplash.com/photo-1509840144524-a292d3c6fa4c?auto=format&fit=crop&q=80&w=400&h=225', // Spain bright style
+    'ru-1v1': 'https://images.unsplash.com/photo-1547483238-2cbf88bc1463?auto=format&fit=crop&q=80&w=400&h=225', // Study setup
+    'it-1v1': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&q=80&w=400&h=225', // Rome skyline
+    'th-1v1': 'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?auto=format&fit=crop&q=80&w=400&h=225', // Modern library
+    'vi-1v1': 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&q=80&w=400&h=225', // Beautiful study place
+    'ar-1v1': 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=400&h=225', // Workspace flatlay
+    'la-1v1': 'https://images.unsplash.com/photo-1447069387593-a5de0862481e?auto=format&fit=crop&q=80&w=400&h=225', // Classical books
+    'yue-1v1': 'https://images.unsplash.com/photo-1507504038482-762104524ef5?auto=format&fit=crop&q=80&w=400&h=225', // Hong Kong skyline study context
+    
+    // Minor language recorded
+    'fr-0-b2': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=400&h=225', // Paris
+    'de-0-b1': 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&q=80&w=400&h=225', // Germany
+    'es-0-a2': 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=crop&q=80&w=400&h=225', // Spain
+    'ru-0-b1': 'https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?auto=format&fit=crop&q=80&w=400&h=225', // Russian study
+    'it-0-a2': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&q=80&w=400&h=225', // Italy
+  };
+  return imageMap[id] || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400&h=225'; // Fallback study desk
+};
+
+const getThumbnailLabel = (item: Course) => {
+  if (item.id.includes('jp')) return '日语备考';
+  if (item.id.includes('kr')) return '韩语备考';
+  if (item.id.includes('ielts')) return '雅思考试';
+  if (item.id.includes('oral')) return '口语突破';
+  if (item.id.includes('fr')) return '法语精修';
+  if (item.id.includes('de')) return '德语精修';
+  if (item.id.includes('es')) return '西语精修';
+  if (item.id.includes('ru')) return '俄语精修';
+  return '精选小语种';
+};
+
+// --- Premium Course Card (Reference Image 1) ---
+
+const CourseCard = ({ 
+  item, 
+  onClick, 
+  isMixed = false, 
+  isSingleColumn = true 
+}: { 
+  item: Course; 
+  onClick: () => void; 
+  isMixed?: boolean; 
+  isSingleColumn?: boolean;
+  key?: React.Key 
+}) => {
+  const { rating, count } = getCourseMeta(item);
+
+  if (isSingleColumn) {
+    return (
+      <div 
+        onClick={onClick}
+        className="bg-white rounded-3xl overflow-hidden border border-gray-100/60 shadow-[0_4px_18px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300 flex p-3 gap-3.5 cursor-pointer hover:translate-y-[-1px] relative group w-full"
+      >
+        {/* Left Thumbnail Box (Square Aspect) */}
+        <div className="relative w-28 h-28 flex-shrink-0 bg-gray-50 rounded-2xl overflow-hidden shadow-xs">
+          <img 
+            src={getCourseImage(item.id)} 
+            alt={item.title} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            referrerPolicy="no-referrer" 
+          />
+          
+          {/* Play Icon overlay for recorded courses */}
+          {!isMixed && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-all">
+              <div className="w-8 h-8 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-[1px] shadow-sm">
+                <Play className="w-3.5 h-3.5 text-white fill-white ml-0.5" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Course Details Block */}
+        <div className="flex-1 flex flex-col justify-between min-w-0">
+          <div>
+            {/* Bold 2-line wrapped title */}
+            <h4 className="text-xs font-bold text-gray-900 leading-snug line-clamp-2 min-h-[32px] tracking-tight group-hover:text-orange-500 transition-colors">
+              {item.title}
+            </h4>
+            
+            {/* Tag row inspired by reference image (e.g. "听力必修课" + pink badge "听力提分") */}
+            <div className="mt-1 flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] text-gray-500 font-medium">
+                {item.tags?.[0] || '核心必修课'}
+              </span>
+              <span className="inline-block border border-rose-200 bg-rose-50 text-rose-500 text-[8px] font-bold px-1.5 py-0.5 rounded-md">
+                {item.tags?.[1] || '提分推荐'}
+              </span>
+            </div>
+
+            {/* Rating system showing course score and review counts */}
+            <div className="mt-1.5">
+              <StarRating rating={rating} count={count} />
+            </div>
+          </div>
+
+          {/* Bottom pricing row */}
+          <div className="flex items-center justify-between border-t border-gray-50 pt-2 mt-1">
+            <span className="text-orange-500 font-extrabold text-sm tracking-tight flex items-baseline gap-0.5">
+              <span className="text-[10px] font-bold">¥</span>
+              {item.price || '399'}
+            </span>
+            <span className="text-[9px] text-gray-400 font-medium">
+              {item.lessons || '32课时'} · {isMixed ? '直播课' : '录播课'}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    // Two-column grid layout (一行双课)
+    return (
+      <div 
+        onClick={onClick}
+        className="bg-white rounded-2xl overflow-hidden border border-gray-100/60 shadow-[0_4px_12px_rgba(0,0,0,0.015)] hover:shadow-md transition-all duration-300 flex flex-col p-2.5 cursor-pointer hover:translate-y-[-1px] relative group w-full"
+      >
+        {/* Top Thumbnail Box (16:9 Aspect) */}
+        <div className="relative aspect-video w-full bg-gray-50 rounded-xl overflow-hidden shadow-xs flex-shrink-0 mb-2">
+          <img 
+            src={getCourseImage(item.id)} 
+            alt={item.title} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            referrerPolicy="no-referrer" 
+          />
+          
+          {/* Play Icon overlay for recorded courses */}
+          {!isMixed && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-all">
+              <div className="w-7 h-7 bg-black/40 rounded-full flex items-center justify-center backdrop-blur-[1px] shadow-sm">
+                <Play className="w-3 h-3 text-white fill-white ml-0.5" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Course Details Block */}
+        <div className="flex-1 flex flex-col justify-between min-w-0 px-1 pb-1">
+          <div>
+            {/* Bold 2-line wrapped title */}
+            <h4 className="text-[11px] font-bold text-gray-900 leading-snug line-clamp-2 min-h-[30px] tracking-tight group-hover:text-orange-500 transition-colors">
+              {item.title}
+            </h4>
+            
+            {/* Tag row - more compact in grid mode */}
+            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+              <span className="inline-block border border-rose-100 bg-rose-50 text-rose-500 text-[8px] font-bold px-1 py-0.2 rounded">
+                {item.tags?.[1] || '提分'}
+              </span>
+              <span className="text-[9px] text-gray-400">
+                {item.tags?.[0] || '核心课'}
+              </span>
+            </div>
+
+            {/* Rating system showing course score and review counts */}
+            <div className="mt-1">
+              <StarRating rating={rating} count={count} />
+            </div>
+          </div>
+
+          {/* Bottom pricing row */}
+          <div className="flex items-center justify-between border-t border-gray-50 pt-1.5 mt-2">
+            <span className="text-orange-500 font-extrabold text-[12px] tracking-tight flex items-baseline gap-0.5">
+              <span className="text-[9px] font-bold">¥</span>
+              {item.price || '399'}
+            </span>
+            <span className="text-[8px] text-gray-400">
+              {item.lessons || '32课时'}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+};
+
+const getBannerImage = (title: string) => {
+  if (title === "英语口语") {
+    return "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=280&h=280";
+  } else if (title === "雅思课程") {
+    return "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=280&h=280";
+  } else if (title === "日韩留学") {
+    return "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=280&h=280"; // Tokyo scenery
+  } else if (title === "小语种课程") {
+    return "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=280&h=280"; // Language study globe
+  }
+  return "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=280&h=280";
+};
+
+// --- Custom Styled Premium Banners (Reference Image 1 & User Request) ---
+
+const CourseListBanner = ({ title, onClick }: { title: string; onClick?: () => void }) => {
+  let gradient = "from-indigo-600 via-indigo-700 to-violet-800";
+  let mainTitle = "1v1 地道口语特训班";
+  let badgeText = "ENG TALK";
+  let subtitle = "纯正母语外教 · 24h自由预约 · 场景实战体系";
+  
+  if (title === "英语口语") {
+    gradient = "from-indigo-600 via-violet-700 to-purple-800";
+    mainTitle = "1v1 地道口语特训班";
+    badgeText = "ENG TALK";
+    subtitle = "纯正母语外教 · 24h自由预约 · 场景实战体系";
+  } else if (title === "雅思课程") {
+    gradient = "from-purple-700 via-indigo-800 to-pink-700";
+    mainTitle = "雅思全科口语考前直击";
+    badgeText = "IELTS 7.5+";
+    subtitle = "历年真题精准预测 · 独家答题模板 · 考官双重精批";
+  } else if (title === "日韩留学") {
+    gradient = "from-rose-500 via-orange-500 to-amber-500";
+    mainTitle = "日韩名校申请直通车";
+    badgeText = "JP/KR STUDY";
+    subtitle = "0基础直达高级 · EJU/TOPIK提分 · 1v1安心申请规划";
+  } else if (title === "小语种课程") {
+    gradient = "from-emerald-600 via-teal-700 to-cyan-600";
+    mainTitle = "多语种高能会话精品班";
+    badgeText = "MULTILINGUAL";
+    subtitle = "法/德/西/俄/意 欧标认证师资 · 1v1实战强效提分";
+  }
+
+  const bannerImg = getBannerImage(title);
+
+  return (
+    <div className="px-4 py-4">
+      <div 
+        onClick={onClick}
+        className={`w-full bg-gradient-to-r ${gradient} rounded-3xl p-6 text-white relative overflow-hidden shadow-lg shadow-indigo-100/10 min-h-[140px] flex items-center justify-between cursor-pointer hover:brightness-105 active:scale-[0.99] transition-all duration-300 group/banner`}
+      >
+        {/* Abstract decorative elements */}
+        <div className="absolute right-[-10px] top-[-10px] w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute left-[30%] bottom-[-20px] w-24 h-24 bg-black/10 rounded-full blur-xl pointer-events-none" />
+        
+        <div className="relative z-10 max-w-[65%]">
+          <span className="inline-block bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[9px] font-extrabold border border-white/20 tracking-wider uppercase mb-2">
+            {badgeText}
+          </span>
+          <h2 className="text-xl font-black tracking-tight leading-tight mb-1 group-hover/banner:text-orange-100 transition-colors">{mainTitle}</h2>
+          <p className="text-[11px] text-white/80 leading-relaxed font-medium">
+            {subtitle}
+          </p>
+        </div>
+
+        {/* Beautiful right-aligned rounded photo illustrating the course category */}
+        <div className="relative z-10 w-20 h-20 flex-shrink-0 rounded-2xl overflow-hidden border border-white/20 shadow-sm">
+          <img 
+            src={bannerImg} 
+            alt={title} 
+            className="w-full h-full object-cover group-hover/banner:scale-105 transition-transform duration-500"
+            referrerPolicy="no-referrer"
+          />
         </div>
       </div>
     </div>
   );
 };
 
-// --- Page: Course List ---
+// --- Section Header with Avatar Stack (Reference Image 2) ---
 
-const CourseListPage = ({ 
-  title, 
-  mixedCourses, 
-  recordedCourses, 
-  onBack, 
-  onSelectCourse,
-  mixedTitle = "混播课"
-}: { 
-  title: string; 
-  mixedCourses: Course[]; 
-  recordedCourses: Course[]; 
-  onBack: () => void; 
-  onSelectCourse: (course: Course) => void;
-  mixedTitle?: string;
-}) => {
+const SectionTitleWithAvatars = ({ title, subtitle }: { title: string; subtitle: string }) => {
   return (
-    <div className="bg-gray-50 min-h-screen pb-10">
-      <Header title={title} onBack={onBack} />
-      
-      {/* Banner */}
-      <div className="px-4 py-4">
-        <div className="w-full aspect-[21/9] rounded-2xl overflow-hidden shadow-md">
-          <img 
-            src={`https://picsum.photos/seed/${title}/800/400`} 
-            alt="Banner" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
+    <div className="px-4 py-4 flex justify-between items-center">
+      <div className="flex-1 min-w-0 pr-2">
+        <h2 className="text-xl font-bold text-gray-900 tracking-tight">{title}</h2>
+        <p className="text-xs text-gray-400 mt-0.5 truncate">{subtitle}</p>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0 bg-white border border-gray-100/80 px-2 py-1 rounded-full shadow-xs">
+        <div className="flex -space-x-1.5">
+          <img className="w-5 h-5 rounded-full border border-white object-cover shadow-xs" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=60&h=60" alt="" referrerPolicy="no-referrer" />
+          <img className="w-5 h-5 rounded-full border border-white object-cover shadow-xs" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=60&h=60" alt="" referrerPolicy="no-referrer" />
+          <img className="w-5 h-5 rounded-full border border-white object-cover shadow-xs" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=60&h=60" alt="" referrerPolicy="no-referrer" />
+        </div>
+        <span className="text-[10px] text-gray-400 font-bold tracking-tight">15022</span>
+      </div>
+    </div>
+  );
+};
+
+// --- Custom King Kong Positions Mapper (Reference Image 2) ---
+
+const getKingKongStyle = (id: string) => {
+  switch (id) {
+    case 'oral':
+      return {
+        bg: "bg-gradient-to-br from-violet-600 to-purple-700 shadow-purple-100",
+        icon: <div className="text-white font-black text-xl tracking-tighter select-none font-sans">Aa</div>,
+        badge: null
+      };
+    case 'ielts':
+      return {
+        bg: "bg-gradient-to-br from-amber-400 to-orange-500 shadow-orange-100",
+        icon: <MessageSquare className="w-7 h-7 text-white fill-white/10" />,
+        badge: null
+      };
+    case 'study-abroad':
+      return {
+        bg: "bg-gradient-to-br from-rose-500 to-pink-600 shadow-rose-100",
+        icon: <Users className="w-7 h-7 text-white fill-white/10" />,
+        badge: null
+      };
+    case 'minor-lang':
+      return {
+        bg: "bg-gradient-to-br from-cyan-400 to-teal-500 shadow-teal-100",
+        icon: <Play className="w-6 h-6 text-white fill-white ml-0.5" />,
+        badge: null
+      };
+    case 'op3':
+      return {
+        bg: "bg-gradient-to-br from-emerald-500 to-teal-600 shadow-teal-100",
+        icon: <Settings className="w-6 h-6 text-white" />,
+        badge: null
+      };
+    case 'ht-teachers':
+      return {
+        bg: "bg-gradient-to-br from-orange-400 to-amber-500 shadow-orange-100",
+        icon: <Star className="w-6 h-6 text-white fill-white" />,
+        badge: null
+      };
+    case 'op4':
+      return {
+        bg: "bg-gradient-to-br from-rose-400 to-pink-500 shadow-pink-100",
+        icon: <Heart className="w-6 h-6 text-white fill-white" />,
+        badge: null
+      };
+    case 'op8':
+      return {
+        bg: "bg-gradient-to-br from-indigo-500 to-blue-600 shadow-blue-100",
+        icon: <Zap className="w-6 h-6 text-white fill-white" />,
+        badge: null
+      };
+    default:
+      return {
+        bg: "bg-blue-500",
+        icon: <Globe className="w-6 h-6 text-white" />,
+        badge: null
+      };
+  }
+};
+
+// --- Page: Home (Reference Image 2) ---
+
+const HomePage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
+  return (
+    <div className="bg-gray-50 min-h-screen pb-24">
+      <div className="bg-white px-4 pt-4 pb-6 rounded-b-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.015)] border-b border-gray-100/50">
+        
+        {/* Navigation Tabs Header */}
+        <div className="flex justify-between items-center mb-6 px-1">
+          <ChevronLeft className="w-6 h-6 text-gray-800 cursor-pointer hover:scale-105 transition-transform" />
+          <div className="flex gap-8 text-lg font-bold">
+            <span className="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors">课程</span>
+            <span className="text-gray-900 border-b-[3px] border-orange-500 pb-1 cursor-pointer font-bold relative">
+              外教课
+            </span>
+          </div>
+          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-400 to-emerald-400 flex items-center justify-center shadow-xs overflow-hidden border-2 border-white cursor-pointer hover:scale-105 transition-transform">
+             <Globe className="w-5 h-5 text-white" />
+          </div>
+        </div>
+
+        {/* Categories Grid (King Kong positions) */}
+        <div className="grid grid-cols-4 gap-y-6">
+          {KING_KONG_ITEMS.map((item) => {
+            const style = getKingKongStyle(item.id);
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  if (item.id === 'oral') onNavigate('oral');
+                  if (item.id === 'ielts') onNavigate('ielts');
+                  if (item.id === 'study-abroad') onNavigate('study-abroad');
+                  if (item.id === 'minor-lang') onNavigate('minor-lang');
+                  if (item.id === 'ht-teachers') onNavigate('ht-teachers');
+                }}
+                className="flex flex-col items-center gap-2 active:scale-95 transition-transform group"
+              >
+                <div className={`${style.bg} w-14 h-14 rounded-[22px] flex items-center justify-center shadow-[0_8px_20px_rgba(0,0,0,0.04)] relative transition-all duration-300 hover:translate-y-[-2px]`}>
+                  {style.icon}
+                  {style.badge}
+                </div>
+                <span className="text-[11px] text-gray-700 font-bold text-center px-1 group-hover:text-orange-500 transition-colors">
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Mixed Courses */}
-      {mixedCourses.length > 0 && (
-        <>
-          <SectionTitle title={mixedTitle} />
-          <div className="px-4 mb-6">
-            <div className="grid grid-cols-2 gap-4">
-              {mixedCourses.map((item, idx) => (
-                <div 
-                  key={idx} 
-                  onClick={() => onSelectCourse(item)}
-                  className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50 flex flex-col justify-between min-h-[160px] relative overflow-hidden active:scale-95 transition-transform cursor-pointer"
-                >
-                  <div className="absolute -right-2 -top-2 opacity-5 text-6xl font-black select-none">
-                    {item.icon || item.title[0]}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-gray-800 leading-snug">{item.title}</h4>
-                    <div className="mt-3 flex flex-wrap gap-1">
-                      {item.tags?.map(tag => (
-                        <span key={tag} className="px-1.5 py-0.5 border border-orange-200 text-[10px] text-orange-400 rounded">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <button className="w-full py-1.5 border border-orange-300 text-orange-400 text-xs rounded-full font-medium">
-                      查看详情
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Featured Section */}
+      <SectionTitleWithAvatars title="精选语伴" subtitle="每天15分钟，和母语语伴固定练习" />
+      
+      {/* Featured Language Partner Slide/Banner */}
+      <div className="px-4">
+        <div className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-700 rounded-3xl p-5 flex items-center justify-between relative overflow-hidden h-32 shadow-md shadow-emerald-100/50 hover:scale-[1.01] transition-transform cursor-pointer">
+          {/* Decorative shapes */}
+          <div className="absolute left-[-20px] top-[-20px] w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute right-[20%] bottom-[-10px] w-32 h-32 bg-emerald-400/20 rounded-full blur-xl pointer-events-none" />
+          
+          <div className="z-10 flex flex-col justify-center h-full">
+            <p className="text-white/80 text-xs font-semibold tracking-wide uppercase mb-1">15分钟地道韩语聊出来</p>
+            <h3 className="text-white text-xl font-extrabold flex items-center gap-1.5">
+              韩语精选语伴
+              <div className="bg-rose-500 rounded-full p-1 shadow-md shadow-rose-950/20 hover:scale-110 transition-transform flex items-center justify-center">
+                <ChevronRight className="w-3.5 h-3.5 text-white stroke-[3px]" />
+              </div>
+            </h3>
           </div>
-        </>
-      )}
+          
+          <div className="absolute right-0 bottom-0 top-0 w-36 flex items-end justify-end pointer-events-none select-none">
+            <img 
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250&h=250" 
+              alt="Korean Tutor" 
+              className="w-full h-full object-cover object-top filter drop-shadow-md rounded-br-3xl"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        </div>
+      </div>
 
-      {/* Recorded Courses */}
-      {recordedCourses.length > 0 && (
-        <>
-          <SectionTitle title="录播课" extra="更多" />
-          <div className="px-4 mb-6">
-            <div className="grid grid-cols-2 gap-4">
-              {recordedCourses.map((item, idx) => (
-                <div 
+      {/* Chat Partners Section */}
+      <SectionTitle title="语伴畅聊" subtitle="自由预约，不限语种不限语伴" extra="更多" />
+
+      {/* Tutors Grid (Side-by-side design from Image 2) */}
+      <div className="px-4 grid grid-cols-2 gap-4">
+        {[
+          {
+            name: "Den",
+            languages: "英语/俄语",
+            flag: "us",
+            bio: "Hello friends! 👋 Let's practice speaking naturally.",
+            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150"
+          },
+          {
+            name: "Graeme Carling",
+            languages: "英语",
+            flag: "gb",
+            bio: "Hey all, I'm Graeme. Fun and practical english sessions!",
+            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150"
+          }
+        ].map((tutor, i) => (
+          <div key={i} className="bg-white rounded-3xl p-5 border border-gray-100/60 shadow-[0_4px_18px_rgba(0,0,0,0.015)] flex flex-col items-center text-center relative hover:shadow-md transition-all duration-300">
+            {/* Top Right Speaker Icon */}
+            <div className="absolute top-4 right-4 text-gray-300 hover:text-orange-400 cursor-pointer transition-colors">
+              <Volume2 className="w-5 h-5" />
+            </div>
+
+            {/* Circular Avatar with Floating Flag */}
+            <div className="relative mt-2">
+              <img 
+                src={tutor.avatar} 
+                alt={tutor.name} 
+                className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute bottom-0 left-0 bg-white rounded-full p-1 shadow-md border border-gray-50 flex items-center justify-center">
+                <img src={`https://flagcdn.com/w20/${tutor.flag}.png`} alt="Flag" className="w-4 h-3 rounded-xs object-cover" />
+              </div>
+            </div>
+
+            {/* Name */}
+            <h4 className="mt-3.5 font-bold text-gray-900 text-sm tracking-tight">{tutor.name}</h4>
+            
+            {/* Languages Badge */}
+            <div className="bg-gray-100/80 text-gray-500 px-3 py-0.5 rounded-full text-[10px] font-semibold mt-1.5 tracking-wide">
+              {tutor.languages}
+            </div>
+
+            {/* Bio Message */}
+            <p className="text-[11px] text-gray-400 mt-2.5 line-clamp-2 h-8 leading-snug w-full px-1">
+              {tutor.bio}
+            </p>
+
+            {/* Booking Button */}
+            <button className="mt-4 w-full py-2 bg-orange-50/80 hover:bg-orange-100 text-orange-600 rounded-2xl text-[11px] font-bold tracking-wide active:scale-95 transition-all duration-200">
+              立即预约
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Sticky Bottom Nav Bar styled like Image 2 */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-gray-100/80 py-3 px-6 flex justify-center items-center shadow-[0_-8px_30px_rgba(0,0,0,0.03)] z-40">
+        <div className="flex items-center gap-2 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 text-orange-600 px-6 py-2 rounded-full font-extrabold shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <BookOpen className="w-4 h-4 text-orange-500 stroke-[2.5px]" />
+          <span className="text-xs tracking-wider">我的课表</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface CourseGroup {
+  title: string;
+  courses: Course[];
+}
+
+const CourseListPage = ({ 
+  title, 
+  groups, 
+  onBack, 
+  onSelectCourse
+}: { 
+  title: string; 
+  groups: CourseGroup[]; 
+  onBack: () => void; 
+  onSelectCourse: (course: Course) => void;
+}) => {
+  const [isSingleColumn, setIsSingleColumn] = useState(true);
+
+  return (
+    <div className="bg-gray-50 min-h-screen pb-10">
+      <Header 
+        title={title} 
+        onBack={onBack} 
+        rightElement={
+          <button 
+            onClick={() => setIsSingleColumn(!isSingleColumn)}
+            className="p-2 rounded-xl bg-orange-50 border border-orange-100 hover:bg-orange-100/70 text-orange-600 transition-all duration-200 flex items-center justify-center shadow-xs active:scale-95"
+            title={isSingleColumn ? "切换到一行双课" : "切换到一行一课"}
+          >
+            {isSingleColumn ? (
+              <Grid className="w-4 h-4" />
+            ) : (
+              <LayoutList className="w-4 h-4" />
+            )}
+          </button>
+        }
+      />
+      
+      {/* Custom styled beautiful banner based on the active category */}
+      <CourseListBanner 
+        title={title} 
+        onClick={() => {
+          const firstCourse = groups[0]?.courses[0];
+          if (firstCourse) {
+            onSelectCourse(firstCourse);
+          }
+        }}
+      />
+
+      {/* Render each course group dynamically */}
+      {groups.map((group, groupIdx) => (
+        <div key={groupIdx} className="mb-4">
+          <SectionTitle title={group.title} />
+          {isSingleColumn ? (
+            <div className="px-4 space-y-4">
+              {group.courses.map((item, idx) => (
+                <CourseCard 
                   key={idx} 
-                  onClick={() => onSelectCourse(item)}
-                  className="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col active:scale-95 transition-transform cursor-pointer"
-                >
-                  <div className="relative aspect-video bg-gray-100">
-                    <img src={`https://picsum.photos/seed/${item.seed || item.id}/400/225`} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-8 h-8 bg-black/30 rounded-full flex items-center justify-center backdrop-blur-[2px]">
-                        <Play className="w-4 h-4 text-white fill-white ml-0.5" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-2 right-2 bg-black/40 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
-                      {item.lessons || '32课时'}
-                    </div>
-                  </div>
-                  <div className="p-3 flex-1 flex flex-col justify-between">
-                    <h4 className="text-xs font-bold text-gray-800 line-clamp-2 leading-tight">{item.title}</h4>
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className="text-[10px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">录播课</span>
-                    </div>
-                  </div>
-                </div>
+                  item={item} 
+                  onClick={() => onSelectCourse(item)} 
+                  isMixed={item.tags?.includes('直播课') || item.tags?.includes('混播课') || item.id.includes('eu') || item.id.includes('ph') || item.id.includes('kids') || item.id.includes('vip')} 
+                  isSingleColumn={true}
+                />
               ))}
             </div>
-          </div>
-        </>
-      )}
+          ) : (
+            <div className="px-4 grid grid-cols-2 gap-4">
+              {group.courses.map((item, idx) => (
+                <CourseCard 
+                  key={idx} 
+                  item={item} 
+                  onClick={() => onSelectCourse(item)} 
+                  isMixed={item.tags?.includes('直播课') || item.tags?.includes('混播课') || item.id.includes('eu') || item.id.includes('ph') || item.id.includes('kids') || item.id.includes('vip')} 
+                  isSingleColumn={false}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
@@ -372,6 +814,8 @@ const CourseDetailPage = ({ course, onBack }: { course: Course; onBack: () => vo
   const isIELTS = course.type === 'ielts';
   const isJapan = course.type === 'japan';
   const isKorea = course.type === 'korea';
+
+  const { rating, count } = getCourseMeta(course);
 
   const painPoints = isIELTS ? [
     "每次考试口语总是5.5分，流利度、词汇、语法、发音总有一项拖后腿？",
@@ -406,7 +850,7 @@ const CourseDetailPage = ({ course, onBack }: { course: Course; onBack: () => vo
         <div className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col md:flex-row">
           <div className="relative w-full md:w-1/2 aspect-video bg-gray-100">
             <img 
-              src={`https://picsum.photos/seed/${course.seed || 'course'}/400/225`} 
+              src={getCourseImage(course.id)} 
               alt="Course" 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
@@ -421,6 +865,12 @@ const CourseDetailPage = ({ course, onBack }: { course: Course; onBack: () => vo
             <div>
               <h3 className="text-lg font-bold text-gray-900 leading-tight">{course.title}</h3>
               <p className="text-xs text-gray-400 mt-1">{course.subtitle || '资深名师深度陪练，针对性突破薄弱项，助力高分'}</p>
+              
+              {/* Star Rating Display */}
+              <div className="mt-2.5">
+                <StarRating rating={rating} count={count} />
+              </div>
+
               <div className="mt-3 flex items-baseline gap-1">
                 <span className="text-orange-500 text-sm font-bold">¥</span>
                 <span className="text-orange-500 text-2xl font-bold">{course.price || '399'}</span>
@@ -611,10 +1061,10 @@ const CourseDetailPage = ({ course, onBack }: { course: Course; onBack: () => vo
       {/* Marketing Images Gallery */}
       <div className="px-4 mt-10 space-y-4">
         <div className="rounded-2xl overflow-hidden shadow-sm">
-          <img src={`https://picsum.photos/seed/${course.seed}-m1/800/400`} alt="Marketing 1" className="w-full" referrerPolicy="no-referrer" />
+          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800&h=400" alt="Marketing 1" className="w-full" referrerPolicy="no-referrer" />
         </div>
         <div className="rounded-2xl overflow-hidden shadow-sm">
-          <img src={`https://picsum.photos/seed/${course.seed}-m2/800/400`} alt="Marketing 2" className="w-full" referrerPolicy="no-referrer" />
+          <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800&h=400" alt="Marketing 2" className="w-full" referrerPolicy="no-referrer" />
         </div>
       </div>
     </div>
@@ -686,61 +1136,104 @@ export default function App() {
     setCurrentPage('course-detail');
   };
 
-  const oralMixed: Course[] = [
-    { id: 'oral-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['直播课', '欧美1v1'], icon: '欧', seed: 'oral-eu', type: 'oral' },
-    { id: 'oral-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['直播课', '菲教1v1'], icon: '菲', seed: 'oral-ph', type: 'oral' },
-    { id: 'oral-kids', title: 'kids外教1v1（所有课时包集合页）', tags: ['直播课', '少儿1v1'], icon: 'K', seed: 'oral-kids', type: 'oral' },
-  ];
-  const oralRec: Course[] = [
-    { id: 'oral-biz', title: '流利商务口语', tags: ['录播课'], seed: 'oral-biz', type: 'oral' },
-    { id: 'oral-life', title: '生活口语达人训练营', tags: ['录播课'], seed: 'oral-life', type: 'oral' },
-  ];
-
-  const ieltsMixed: Course[] = [];
-  const ieltsRec: Course[] = [
-    { id: 'ielts-hitalk', title: 'Hitalk雅思外教1v1口语陪练', tags: ['录播课', '口语陪练'], seed: 'ielts-hitalk', type: 'ielts' },
-    { id: 'ielts-premium', title: '雅思1v1精品班（所有课时包集合页）', tags: ['录播课', '精品1v1'], seed: 'ielts-premium', type: 'ielts' },
-    { id: 'ielts-vip', title: '雅思7分VIP班（定制班）', tags: ['录播课', '方案定制'], seed: 'ielts-vip', type: 'ielts' },
-    { id: 'ielts-65', title: '初级水平直达雅思6.5分', tags: ['录播课'], seed: 'ielts-65', type: 'ielts' },
-  ];
-
-  const studyAbroadMixed: Course[] = [
-    { id: 'jp-n1', title: '日语N1备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N1'], icon: 'N1', seed: 'jp-n1', type: 'japan' },
-    { id: 'jp-n2', title: '日语N2备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N2'], icon: 'N2', seed: 'jp-n2', type: 'japan' },
-    { id: 'jp-n3', title: '日语N3备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N3'], icon: 'N3', seed: 'jp-n3', type: 'japan' },
-    { id: 'kr-vip-1v1', title: '韩语入门至初级VIP【1V1班】', tags: ['混播课', 'VIP'], icon: 'V', seed: 'kr-vip-1v1', type: 'korea' },
-    { id: 'kr-vip-custom', title: '韩语入门至高级VIP【方案定制】', tags: ['混播课', '定制'], icon: '高', seed: 'kr-vip-custom', type: 'korea' },
-    { id: 'kr-topik', title: '韩语入门至TOPIK中级【随到随学班】', tags: ['混播课', 'TOPIK'], icon: 'T', seed: 'kr-topik', type: 'korea' },
-    { id: 'kr-1v1-custom', title: '韩语1V1【VIP定制班】', tags: ['混播课', '1V1'], icon: '1', seed: 'kr-1v1-custom', type: 'korea' },
-  ];
-  const studyAbroadRec: Course[] = [
-    { id: 'jp-0-n1', title: '新编日语0-N1', tags: ['录播课'], seed: 'jp-0-n1', type: 'japan' },
-    { id: 'jp-biz', title: '商务日语会话', tags: ['录播课'], seed: 'jp-biz', type: 'japan' },
-    { id: 'jp-study-custom', title: '赴日留学安心定制班', tags: ['录播课'], seed: 'jp-study-custom', type: 'japan' },
-    { id: 'kr-life-sale', title: '韩语生活会话入门至流畅【双年特惠班】', tags: ['录播课'], seed: 'kr-life-sale', type: 'korea' },
+  const oralGroups: CourseGroup[] = [
+    {
+      title: "外教1V1定制课程",
+      courses: [
+        { id: 'oral-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['直播课', '欧美1v1'], icon: '欧', seed: 'oral-eu', type: 'oral' },
+        { id: 'oral-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['直播课', '菲教1v1'], icon: '菲', seed: 'oral-ph', type: 'oral' },
+      ]
+    },
+    {
+      title: "少儿与日常口语",
+      courses: [
+        { id: 'oral-kids', title: 'kids外教1v1（所有课时包集合页）', tags: ['直播课', '少儿1v1'], icon: 'K', seed: 'oral-kids', type: 'oral' },
+        { id: 'oral-life', title: '生活口语达人训练营', tags: ['录播课', '日常情景'], seed: 'oral-life', type: 'oral' },
+      ]
+    },
+    {
+      title: "商务口语提分",
+      courses: [
+        { id: 'oral-biz', title: '流利商务口语', tags: ['录播课', '职场商务'], seed: 'oral-biz', type: 'oral' },
+      ]
+    }
   ];
 
-  const minorLangMixed: Course[] = [
-    { id: 'fr-vip-custom', title: '法语零基础至中级（0-A2）VIP【方案定制班】', tags: ['混播课'], icon: '法', seed: 'fr-vip-custom', type: 'minor' },
-    { id: 'es-vip-custom', title: '西语零起点至生活会话1V1强化【学习方案定制】', tags: ['混播课'], icon: '西', seed: 'es-vip-custom', type: 'minor' },
-    { id: 'ru-vip-custom', title: '俄语(0-B2)尊享VIP【方案定制班】', tags: ['混播课'], icon: '俄', seed: 'ru-vip-custom', type: 'minor' },
-    { id: 'fr-1v1', title: '法语1V1【VIP定制班】', tags: ['混播课'], icon: 'F', seed: 'fr-1v1', type: 'minor' },
-    { id: 'de-1v1', title: '德语1V1【VIP定制班】', tags: ['混播课'], icon: 'D', seed: 'de-1v1', type: 'minor' },
-    { id: 'es-1v1', title: '西班牙语1V1【VIP定制班】', tags: ['混播课'], icon: 'S', seed: 'es-1v1', type: 'minor' },
-    { id: 'ru-1v1', title: '俄语1V1【VIP定制班】', tags: ['混播课'], icon: 'R', seed: 'ru-1v1', type: 'minor' },
-    { id: 'it-1v1', title: '意大利语1V1【VIP定制班】', tags: ['混播课'], icon: 'I', seed: 'it-1v1', type: 'minor' },
-    { id: 'th-1v1', title: '泰语1V1【VIP定制班】', tags: ['混播课'], icon: 'T', seed: 'th-1v1', type: 'minor' },
-    { id: 'vi-1v1', title: '越南语1V1【VIP定制班】', tags: ['混播课'], icon: 'V', seed: 'vi-1v1', type: 'minor' },
-    { id: 'ar-1v1', title: '阿拉伯语1V1【VIP定制班】', tags: ['混播课'], icon: 'A', seed: 'ar-1v1', type: 'minor' },
-    { id: 'la-1v1', title: '拉丁语1V1【VIP定制班】', tags: ['混播课'], icon: 'L', seed: 'la-1v1', type: 'minor' },
-    { id: 'yue-1v1', title: '粤语1V1【VIP定制班】', tags: ['混播课'], icon: 'Y', seed: 'yue-1v1', type: 'minor' },
+  const ieltsGroups: CourseGroup[] = [
+    {
+      title: "初级水平基础班",
+      courses: [
+        { id: 'ielts-65', title: '初级水平直达雅思6.5分', tags: ['录播课', '基础特训'], seed: 'ielts-65', type: 'ielts' },
+      ]
+    },
+    {
+      title: "中高级考前提分",
+      courses: [
+        { id: 'ielts-hitalk', title: 'Hitalk雅思外教1v1口语陪练', tags: ['录播课', '口语陪练'], seed: 'ielts-hitalk', type: 'ielts' },
+        { id: 'ielts-premium', title: '雅思1v1精品班（所有课时包集合页）', tags: ['录播课', '精品1v1'], seed: 'ielts-premium', type: 'ielts' },
+      ]
+    },
+    {
+      title: "全程方案定制",
+      courses: [
+        { id: 'ielts-vip', title: '雅思7分VIP班（定制班）', tags: ['录播课', '方案定制'], seed: 'ielts-vip', type: 'ielts' },
+      ]
+    }
   ];
-  const minorLangRec: Course[] = [
-    { id: 'fr-0-b2', title: 'E-French法语0-B2语法精讲【随到随学班】', tags: ['录播课'], seed: 'fr-0-b2', type: 'minor' },
-    { id: 'de-0-b1', title: '新版德语零基础至中高级（0-B1）【随到随学班】', tags: ['录播课'], seed: 'de-0-b1', type: 'minor' },
-    { id: 'es-0-a2', title: '【U-Spanish】西班牙语零起点至中级0-A2【随到随学班】', tags: ['录播课'], seed: 'es-0-a2', type: 'minor' },
-    { id: 'ru-0-b1', title: '俄语(0-B1)零基础至中高级【随到随学班】', tags: ['录播课'], seed: 'ru-0-b1', type: 'minor' },
-    { id: 'it-0-a2', title: '意大利语(0-A2)零起点至中级【随到随学班】', tags: ['录播课'], seed: 'it-0-a2', type: 'minor' },
+
+  const studyAbroadGroups: CourseGroup[] = [
+    {
+      title: "日本留学推荐",
+      courses: [
+        { id: 'jp-n1', title: '日语N1备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N1辅导'], icon: 'N1', seed: 'jp-n1', type: 'japan' },
+        { id: 'jp-n2', title: '日语N2备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N2备考'], icon: 'N2', seed: 'jp-n2', type: 'japan' },
+        { id: 'jp-n3', title: '日语N3备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N3强化'], icon: 'N3', seed: 'jp-n3', type: 'japan' },
+        { id: 'jp-0-n1', title: '新编日语0-N1', tags: ['录播课', '零基础通关'], seed: 'jp-0-n1', type: 'japan' },
+        { id: 'jp-biz', title: '商务日语会话', tags: ['录播课', '商务日语'], seed: 'jp-biz', type: 'japan' },
+        { id: 'jp-study-custom', title: '赴日留学安心定制班', tags: ['录播课', '定制班型'], seed: 'jp-study-custom', type: 'japan' },
+      ]
+    },
+    {
+      title: "韩国留学推荐",
+      courses: [
+        { id: 'kr-vip-1v1', title: '韩语入门至初级VIP【1V1班】', tags: ['混播课', '韩语入门'], icon: 'V', seed: 'kr-vip-1v1', type: 'korea' },
+        { id: 'kr-vip-custom', title: '韩语入门至高级VIP【方案定制】', tags: ['混播课', '高级VIP'], icon: '高', seed: 'kr-vip-custom', type: 'korea' },
+        { id: 'kr-topik', title: '韩语入门至TOPIK中级【随到随学班】', tags: ['混播课', 'TOPIK突破'], icon: 'T', seed: 'kr-topik', type: 'korea' },
+        { id: 'kr-1v1-custom', title: '韩语1V1【VIP定制班】', tags: ['混播课', '1v1定制'], icon: '1', seed: 'kr-1v1-custom', type: 'korea' },
+        { id: 'kr-life-sale', title: '韩语生活会话入门至流畅【双年特惠班】', tags: ['录播课', '生活会话'], seed: 'kr-life-sale', type: 'korea' },
+      ]
+    }
+  ];
+
+  const minorLangGroups: CourseGroup[] = [
+    {
+      title: "西法德意欧标班",
+      courses: [
+        { id: 'fr-vip-custom', title: '法语零基础至中级（0-A2）VIP【方案定制班】', tags: ['混播课', '法语VIP'], icon: '法', seed: 'fr-vip-custom', type: 'minor' },
+        { id: 'es-vip-custom', title: '西语零起点至生活会话1V1强化【学习方案定制】', tags: ['混播课', '西语VIP'], icon: '西', seed: 'es-vip-custom', type: 'minor' },
+        { id: 'fr-1v1', title: '法语1V1【VIP定制班】', tags: ['混播课', '法语1v1'], icon: 'F', seed: 'fr-1v1', type: 'minor' },
+        { id: 'de-1v1', title: '德语1V1【VIP定制班】', tags: ['混播课', '德语1v1'], icon: 'D', seed: 'de-1v1', type: 'minor' },
+        { id: 'es-1v1', title: '西班牙语1V1【VIP定制班】', tags: ['混播课', '西语1v1'], icon: 'S', seed: 'es-1v1', type: 'minor' },
+        { id: 'it-1v1', title: '意大利语1V1【VIP定制班】', tags: ['混播课', '意语1v1'], icon: 'I', seed: 'it-1v1', type: 'minor' },
+        { id: 'fr-0-b2', title: 'E-French法语0-B2语法精讲【随到随学班】', tags: ['录播课', '法语随到随学'], seed: 'fr-0-b2', type: 'minor' },
+        { id: 'de-0-b1', title: '新版德语零基础至中高级（0-B1）【随到随学班】', tags: ['录播课', '德语随到随学'], seed: 'de-0-b1', type: 'minor' },
+        { id: 'es-0-a2', title: '【U-Spanish】西班牙语零起点至中级0-A2【随到随学班】', tags: ['录播课', '西语随到随学'], seed: 'es-0-a2', type: 'minor' },
+        { id: 'it-0-a2', title: '意大利语(0-A2)零起点至中级【随到随学班】', tags: ['录播课', '意语随到随学'], seed: 'it-0-a2', type: 'minor' },
+      ]
+    },
+    {
+      title: "俄泰越阿等精品班",
+      courses: [
+        { id: 'ru-vip-custom', title: '俄语(0-B2)尊享VIP【方案定制班】', tags: ['混播课', '俄语VIP'], icon: '俄', seed: 'ru-vip-custom', type: 'minor' },
+        { id: 'ru-1v1', title: '俄语1V1【VIP定制班】', tags: ['混播课', '俄语1v1'], icon: 'R', seed: 'ru-1v1', type: 'minor' },
+        { id: 'th-1v1', title: '泰语1V1【VIP定制班】', tags: ['混播课', '泰语1v1'], icon: 'T', seed: 'th-1v1', type: 'minor' },
+        { id: 'vi-1v1', title: '越南语1V1【VIP定制班】', tags: ['混播课', '越语1v1'], icon: 'V', seed: 'vi-1v1', type: 'minor' },
+        { id: 'ar-1v1', title: '阿拉伯语1V1【VIP定制班】', tags: ['混播课', '阿语1v1'], icon: 'A', seed: 'ar-1v1', type: 'minor' },
+        { id: 'la-1v1', title: '拉丁语1V1【VIP定制班】', tags: ['混播课', '拉丁1v1'], icon: 'L', seed: 'la-1v1', type: 'minor' },
+        { id: 'yue-1v1', title: '粤语1V1【VIP定制班】', tags: ['混播课', '粤语1v1'], icon: 'Y', seed: 'yue-1v1', type: 'minor' },
+        { id: 'ru-0-b1', title: '俄语(0-B1)零基础至中高级【随到随学班】', tags: ['录播课', '俄语精讲'], seed: 'ru-0-b1', type: 'minor' },
+      ]
+    }
   ];
 
   return (
@@ -767,9 +1260,7 @@ export default function App() {
           >
             <CourseListPage 
               title="英语口语"
-              mixedCourses={oralMixed}
-              recordedCourses={oralRec}
-              mixedTitle="直播课"
+              groups={oralGroups}
               onBack={() => setCurrentPage('home')} 
               onSelectCourse={(c) => handleSelectCourse(c, 'oral')}
             />
@@ -785,8 +1276,7 @@ export default function App() {
           >
             <CourseListPage 
               title="雅思课程"
-              mixedCourses={ieltsMixed}
-              recordedCourses={ieltsRec}
+              groups={ieltsGroups}
               onBack={() => setCurrentPage('home')} 
               onSelectCourse={(c) => handleSelectCourse(c, 'ielts')}
             />
@@ -802,8 +1292,7 @@ export default function App() {
           >
             <CourseListPage 
               title="日韩留学"
-              mixedCourses={studyAbroadMixed}
-              recordedCourses={studyAbroadRec}
+              groups={studyAbroadGroups}
               onBack={() => setCurrentPage('home')} 
               onSelectCourse={(c) => handleSelectCourse(c, 'study-abroad')}
             />
@@ -819,8 +1308,7 @@ export default function App() {
           >
             <CourseListPage 
               title="小语种课程"
-              mixedCourses={minorLangMixed}
-              recordedCourses={minorLangRec}
+              groups={minorLangGroups}
               onBack={() => setCurrentPage('home')} 
               onSelectCourse={(c) => handleSelectCourse(c, 'minor-lang')}
             />
