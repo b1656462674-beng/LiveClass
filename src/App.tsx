@@ -314,14 +314,16 @@ const CourseCard = ({
               {item.title}
             </h4>
             
-            {/* Tag row inspired by reference image (e.g. "听力必修课" + pink badge "听力提分") */}
-            <div className="mt-1 flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] text-gray-500 font-medium">
-                {item.tags?.[0] || '核心必修课'}
-              </span>
-              <span className="inline-block border border-rose-200 bg-rose-50 text-rose-500 text-[8px] font-bold px-1.5 py-0.5 rounded-md">
-                {item.tags?.[1] || '提分推荐'}
-              </span>
+            {/* Tag row with styled badges side-by-side */}
+            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+              {item.tags?.slice(0, 3).map((tag, tIdx) => (
+                <span 
+                  key={tIdx} 
+                  className="inline-block border border-rose-200 bg-rose-50 text-rose-500 text-[8px] font-extrabold px-1.5 py-0.5 rounded-md"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
 
             {/* Rating system showing course score and review counts */}
@@ -337,7 +339,7 @@ const CourseCard = ({
               {item.price || '399'}
             </span>
             <span className="text-[9px] text-gray-400 font-medium">
-              {item.lessons || '32课时'} · {isMixed ? '直播课' : '录播课'}
+              {item.lessons || '32课时'}
             </span>
           </div>
         </div>
@@ -377,14 +379,16 @@ const CourseCard = ({
               {item.title}
             </h4>
             
-            {/* Tag row - more compact in grid mode */}
+            {/* Tag row with styled badges side-by-side */}
             <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-              <span className="inline-block border border-rose-100 bg-rose-50 text-rose-500 text-[8px] font-bold px-1 py-0.2 rounded">
-                {item.tags?.[1] || '提分'}
-              </span>
-              <span className="text-[9px] text-gray-400">
-                {item.tags?.[0] || '核心课'}
-              </span>
+              {item.tags?.slice(0, 3).map((tag, tIdx) => (
+                <span 
+                  key={tIdx} 
+                  className="inline-block border border-rose-100 bg-rose-50 text-rose-500 text-[8px] font-extrabold px-1 py-0.2 rounded"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
 
             {/* Rating system showing course score and review counts */}
@@ -1140,21 +1144,21 @@ export default function App() {
     {
       title: "外教1V1定制课程",
       courses: [
-        { id: 'oral-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['直播课', '欧美1v1'], icon: '欧', seed: 'oral-eu', type: 'oral' },
-        { id: 'oral-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['直播课', '菲教1v1'], icon: '菲', seed: 'oral-ph', type: 'oral' },
+        { id: 'oral-eu', title: '欧美外教1v1（所有课时包集合页）', tags: ['直播课', '欧美1v1', '母语外教'], icon: '欧', seed: 'oral-eu', type: 'oral' },
+        { id: 'oral-ph', title: '菲律宾外教1v1（所有课时包集合页）', tags: ['直播课', '高性价比'], icon: '菲', seed: 'oral-ph', type: 'oral' },
       ]
     },
     {
       title: "少儿与日常口语",
       courses: [
         { id: 'oral-kids', title: 'kids外教1v1（所有课时包集合页）', tags: ['直播课', '少儿1v1'], icon: 'K', seed: 'oral-kids', type: 'oral' },
-        { id: 'oral-life', title: '生活口语达人训练营', tags: ['录播课', '日常情景'], seed: 'oral-life', type: 'oral' },
+        { id: 'oral-life', title: '生活口语达人训练营', tags: ['录播课', '日常情景', '零基础友好'], seed: 'oral-life', type: 'oral' },
       ]
     },
     {
       title: "商务口语提分",
       courses: [
-        { id: 'oral-biz', title: '流利商务口语', tags: ['录播课', '职场商务'], seed: 'oral-biz', type: 'oral' },
+        { id: 'oral-biz', title: '流利商务口语', tags: ['录播课', '职场晋升'], seed: 'oral-biz', type: 'oral' },
       ]
     }
   ];
@@ -1169,14 +1173,14 @@ export default function App() {
     {
       title: "中高级考前提分",
       courses: [
-        { id: 'ielts-hitalk', title: 'Hitalk雅思外教1v1口语陪练', tags: ['录播课', '口语陪练'], seed: 'ielts-hitalk', type: 'ielts' },
+        { id: 'ielts-hitalk', title: 'Hitalk雅思外教1v1口语陪练', tags: ['录播课', '口语陪练', '外教精批'], seed: 'ielts-hitalk', type: 'ielts' },
         { id: 'ielts-premium', title: '雅思1v1精品班（所有课时包集合页）', tags: ['录播课', '精品1v1'], seed: 'ielts-premium', type: 'ielts' },
       ]
     },
     {
       title: "全程方案定制",
       courses: [
-        { id: 'ielts-vip', title: '雅思7分VIP班（定制班）', tags: ['录播课', '方案定制'], seed: 'ielts-vip', type: 'ielts' },
+        { id: 'ielts-vip', title: '雅思7分VIP班（定制班）', tags: ['录播课', '方案定制', '全程督学'], seed: 'ielts-vip', type: 'ielts' },
       ]
     }
   ];
@@ -1186,20 +1190,20 @@ export default function App() {
       title: "日本留学推荐",
       courses: [
         { id: 'jp-n1', title: '日语N1备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N1辅导'], icon: 'N1', seed: 'jp-n1', type: 'japan' },
-        { id: 'jp-n2', title: '日语N2备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N2备考'], icon: 'N2', seed: 'jp-n2', type: 'japan' },
+        { id: 'jp-n2', title: '日语N2备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N2备考', '冲刺推荐'], icon: 'N2', seed: 'jp-n2', type: 'japan' },
         { id: 'jp-n3', title: '日语N3备考直通车（专项强化+刷题+直播押题）', tags: ['混播课', 'N3强化'], icon: 'N3', seed: 'jp-n3', type: 'japan' },
-        { id: 'jp-0-n1', title: '新编日语0-N1', tags: ['录播课', '零基础通关'], seed: 'jp-0-n1', type: 'japan' },
-        { id: 'jp-biz', title: '商务日语会话', tags: ['录播课', '商务日语'], seed: 'jp-biz', type: 'japan' },
-        { id: 'jp-study-custom', title: '赴日留学安心定制班', tags: ['录播课', '定制班型'], seed: 'jp-study-custom', type: 'japan' },
+        { id: 'jp-0-n1', title: '新编日语0-N1', tags: ['录播课', '零基础通关', '系统精讲'], seed: 'jp-0-n1', type: 'japan' },
+        { id: 'jp-biz', title: '商务日语会话', tags: ['录播课', '实用口语'], seed: 'jp-biz', type: 'japan' },
+        { id: 'jp-study-custom', title: '赴日留学安心定制班', tags: ['录播课', '定制班型', '名校申请'], seed: 'jp-study-custom', type: 'japan' },
       ]
     },
     {
       title: "韩国留学推荐",
       courses: [
         { id: 'kr-vip-1v1', title: '韩语入门至初级VIP【1V1班】', tags: ['混播课', '韩语入门'], icon: 'V', seed: 'kr-vip-1v1', type: 'korea' },
-        { id: 'kr-vip-custom', title: '韩语入门至高级VIP【方案定制】', tags: ['混播课', '高级VIP'], icon: '高', seed: 'kr-vip-custom', type: 'korea' },
+        { id: 'kr-vip-custom', title: '韩语入门至高级VIP【方案定制】', tags: ['混播课', '高级VIP', '名师伴学'], icon: '高', seed: 'kr-vip-custom', type: 'korea' },
         { id: 'kr-topik', title: '韩语入门至TOPIK中级【随到随学班】', tags: ['混播课', 'TOPIK突破'], icon: 'T', seed: 'kr-topik', type: 'korea' },
-        { id: 'kr-1v1-custom', title: '韩语1V1【VIP定制班】', tags: ['混播课', '1v1定制'], icon: '1', seed: 'kr-1v1-custom', type: 'korea' },
+        { id: 'kr-1v1-custom', title: '韩语1V1【VIP定制班】', tags: ['混播课', '1v1定制', '口语强化'], icon: '1', seed: 'kr-1v1-custom', type: 'korea' },
         { id: 'kr-life-sale', title: '韩语生活会话入门至流畅【双年特惠班】', tags: ['录播课', '生活会话'], seed: 'kr-life-sale', type: 'korea' },
       ]
     }
@@ -1210,28 +1214,28 @@ export default function App() {
       title: "西法德意欧标班",
       courses: [
         { id: 'fr-vip-custom', title: '法语零基础至中级（0-A2）VIP【方案定制班】', tags: ['混播课', '法语VIP'], icon: '法', seed: 'fr-vip-custom', type: 'minor' },
-        { id: 'es-vip-custom', title: '西语零起点至生活会话1V1强化【学习方案定制】', tags: ['混播课', '西语VIP'], icon: '西', seed: 'es-vip-custom', type: 'minor' },
-        { id: 'fr-1v1', title: '法语1V1【VIP定制班】', tags: ['混播课', '法语1v1'], icon: 'F', seed: 'fr-1v1', type: 'minor' },
-        { id: 'de-1v1', title: '德语1V1【VIP定制班】', tags: ['混播课', '德语1v1'], icon: 'D', seed: 'de-1v1', type: 'minor' },
-        { id: 'es-1v1', title: '西班牙语1V1【VIP定制班】', tags: ['混播课', '西语1v1'], icon: 'S', seed: 'es-1v1', type: 'minor' },
-        { id: 'it-1v1', title: '意大利语1V1【VIP定制班】', tags: ['混播课', '意语1v1'], icon: 'I', seed: 'it-1v1', type: 'minor' },
-        { id: 'fr-0-b2', title: 'E-French法语0-B2语法精讲【随到随学班】', tags: ['录播课', '法语随到随学'], seed: 'fr-0-b2', type: 'minor' },
-        { id: 'de-0-b1', title: '新版德语零基础至中高级（0-B1）【随到随学班】', tags: ['录播课', '德语随到随学'], seed: 'de-0-b1', type: 'minor' },
-        { id: 'es-0-a2', title: '【U-Spanish】西班牙语零起点至中级0-A2【随到随学班】', tags: ['录播课', '西语随到随学'], seed: 'es-0-a2', type: 'minor' },
-        { id: 'it-0-a2', title: '意大利语(0-A2)零起点至中级【随到随学班】', tags: ['录播课', '意语随到随学'], seed: 'it-0-a2', type: 'minor' },
+        { id: 'es-vip-custom', title: '西语零起点至生活会话1V1强化【学习方案定制】', tags: ['混播课', '西语VIP', '日常实用'], icon: '西', seed: 'es-vip-custom', type: 'minor' },
+        { id: 'fr-1v1', title: '法语1V1【VIP定制班】', tags: ['混播课', '名师陪练'], icon: 'F', seed: 'fr-1v1', type: 'minor' },
+        { id: 'de-1v1', title: '德语1V1【VIP定制班】', tags: ['混播课', '德语1v1', '欧标特训'], icon: 'D', seed: 'de-1v1', type: 'minor' },
+        { id: 'es-1v1', title: '西班牙语1V1【VIP定制班】', tags: ['混播课', '口语流利'], icon: 'S', seed: 'es-1v1', type: 'minor' },
+        { id: 'it-1v1', title: '意大利语1V1【VIP定制班】', tags: ['混播课', '意语1v1', '艺术留学'], icon: 'I', seed: 'it-1v1', type: 'minor' },
+        { id: 'fr-0-b2', title: 'E-French法语0-B2语法精讲【随到随学班】', tags: ['录播课', '随到随学'], seed: 'fr-0-b2', type: 'minor' },
+        { id: 'de-0-b1', title: '新版德语零基础至中高级（0-B1）【随到随学班】', tags: ['录播课', '随到随学', '系统课程'], seed: 'de-0-b1', type: 'minor' },
+        { id: 'es-0-a2', title: '【U-Spanish】西班牙语零起点至中级0-A2【随到随学班】', tags: ['录播课', '会话提升'], seed: 'es-0-a2', type: 'minor' },
+        { id: 'it-0-a2', title: '意大利语(0-A2)零起点至中级【随到随学班】', tags: ['录播课', '随到随学', '日常会话'], seed: 'it-0-a2', type: 'minor' },
       ]
     },
     {
       title: "俄泰越阿等精品班",
       courses: [
         { id: 'ru-vip-custom', title: '俄语(0-B2)尊享VIP【方案定制班】', tags: ['混播课', '俄语VIP'], icon: '俄', seed: 'ru-vip-custom', type: 'minor' },
-        { id: 'ru-1v1', title: '俄语1V1【VIP定制班】', tags: ['混播课', '俄语1v1'], icon: 'R', seed: 'ru-1v1', type: 'minor' },
-        { id: 'th-1v1', title: '泰语1V1【VIP定制班】', tags: ['混播课', '泰语1v1'], icon: 'T', seed: 'th-1v1', type: 'minor' },
-        { id: 'vi-1v1', title: '越南语1V1【VIP定制班】', tags: ['混播课', '越语1v1'], icon: 'V', seed: 'vi-1v1', type: 'minor' },
-        { id: 'ar-1v1', title: '阿拉伯语1V1【VIP定制班】', tags: ['混播课', '阿语1v1'], icon: 'A', seed: 'ar-1v1', type: 'minor' },
-        { id: 'la-1v1', title: '拉丁语1V1【VIP定制班】', tags: ['混播课', '拉丁1v1'], icon: 'L', seed: 'la-1v1', type: 'minor' },
-        { id: 'yue-1v1', title: '粤语1V1【VIP定制班】', tags: ['混播课', '粤语1v1'], icon: 'Y', seed: 'yue-1v1', type: 'minor' },
-        { id: 'ru-0-b1', title: '俄语(0-B1)零基础至中高级【随到随学班】', tags: ['录播课', '俄语精讲'], seed: 'ru-0-b1', type: 'minor' },
+        { id: 'ru-1v1', title: '俄语1V1【VIP定制班】', tags: ['混播课', '俄语1v1', '专属督学'], icon: 'R', seed: 'ru-1v1', type: 'minor' },
+        { id: 'th-1v1', title: '泰语1V1【VIP定制班】', tags: ['混播课', '趣味泰语'], icon: 'T', seed: 'th-1v1', type: 'minor' },
+        { id: 'vi-1v1', title: '越南语1V1【VIP定制班】', tags: ['混播课', '越语1v1', '外贸口语'], icon: 'V', seed: 'vi-1v1', type: 'minor' },
+        { id: 'ar-1v1', title: '阿拉伯语1V1【VIP定制班】', tags: ['混播课', '高端定制'], icon: 'A', seed: 'ar-1v1', type: 'minor' },
+        { id: 'la-1v1', title: '拉丁语1V1【VIP定制班】', tags: ['混播课', '拉丁1v1', '学术进修'], icon: 'L', seed: 'la-1v1', type: 'minor' },
+        { id: 'yue-1v1', title: '粤语1V1【VIP定制班】', tags: ['混播课', '发音速成'], icon: 'Y', seed: 'yue-1v1', type: 'minor' },
+        { id: 'ru-0-b1', title: '俄语(0-B1)零基础至中高级【随到随学班】', tags: ['录播课', '俄语精讲', '随到随学'], seed: 'ru-0-b1', type: 'minor' },
       ]
     }
   ];
